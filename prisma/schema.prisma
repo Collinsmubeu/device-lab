@@ -1,0 +1,107 @@
+/// Device Lab 254 — PostgreSQL data model.
+///
+/// Run locally:
+///   1. `cp .env.example .env` and set DATABASE_URL
+///   2. `npx prisma db push`   (creates the schema in Postgres)
+///   3. `npx prisma generate`  (regenerates the typed client)
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ──────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  STAFF
+  CLIENT
+}
+
+enum ConditionGrade {
+  VAULT
+  MINT
+  GOOD
+  COOKED
+}
+
+enum LaptopStatus {
+  AVAILABLE
+  SOLD
+  ARCHIVED
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum TransactionType {
+  CASH_IN_SALE
+  CASH_OUT_TRADEIN
+}
+
+// ── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  role         UserRole   @default(CLIENT)
+  createdAt    DateTime   @default(now())
+  auditLogs    AuditLog[]
+
+  @@index([email])
+}
+
+model Laptop {
+  id             String         @id @default(uuid())
+  brand          String
+  model          String
+  ram            Int
+  storage        Int
+  processor      String
+  batteryCycles  Int
+  healthScore    Int
+  conditionGrade ConditionGrade
+  price          Int
+  status         LaptopStatus   @default(AVAILABLE)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([brand, status])
+  @@index([conditionGrade])
+}
+
+/// Immutable trail for owner oversight. Deleting a User cascades their audit
+/// entries; in production prefer a soft-`deletedAt` flag so history survives.
+model AuditLog {
+  id        String   @id @default(uuid())
+  timestamp DateTime @default(now())
+  action    String
+  details   String
+  staffId   String
+  staff     User     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@index([staffId])
+  @@index([timestamp(sort: desc)])
+}
+
+/// M-Pesa accounting ledger — one row per payment attempt.
+model Transaction {
+  id           String            @id @default(uuid())
+  amount       Int
+  mpesaReceipt String?           @unique
+  status       TransactionStatus @default(PENDING)
+  type         TransactionType
+  createdAt    DateTime          @default(now())
+
+  @@index([status])
+  @@index([createdAt(sort: desc)])
+}

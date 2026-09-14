@@ -1,0 +1,66 @@
+[
+  {
+    "id": "mbp-m3m-16",
+    "brand": "Apple",
+    "model": "MacBook Pro 16\" (M3 Max)",
+    "specs": {
+      "ramGB": 64,
+      "storageGB": 2048,
+      "processor": "Apple M3 Max (16-core CPU / 40-core GPU)"
+    },
+    "batteryCycleCount": 118,
+    "conditionHealth": 98,
+    "conditionGrade": "VAULT-CONDITION",
+    "coreTier": "[CREATOR]",
+    "priceKsh": 325000,
+    "inStock": true
+  },
+  {
+    "id": "asus-zeph-g14",
+    "brand": "ASUS",
+    "model": "ROG Zephyrus G14 (2024)",
+    "specs": {
+      "ramGB": 32,
+      "storageGB": 1024,
+      "processor": "AMD Ryzen 9 7940HS / RTX 4070"
+    },
+    "batteryCycleCount": 210,
+    "conditionHealth": 92,
+    "conditionGrade": "MINT",
+    "coreTier": "[MAX_GAMING]",
+    "priceKsh": 185000,
+    "inStock": false
+  },
+  {
+    "id": "lenovo-x1g12",
+    "brand": "Lenovo",
+    "model": "ThinkPad X1 Carbon Gen 12",
+    "specs": {
+      "ramGB": 32,
+      "storageGB": 1024,
+      "processor": "Intel Core Ultra 7 155H"
+    },
+    "batteryCycleCount": 42,
+    "conditionHealth": 95,
+    "conditionGrade": "VAULT-CONDITION",
+    "coreTier": "[DEV_RIG]",
+    "priceKsh": 215000,
+    "inStock": true
+  },
+  {
+    "id": "dell-xps17-9730",
+    "brand": "Dell",
+    "model": "XPS 17 9730 (i9-13900H)",
+    "specs": {
+      "ramGB": 64,
+      "storageGB": 2048,
+      "processor": "Intel Core i9-13900H / RTX 4070"
+    },
+    "batteryCycleCount": 980,
+    "conditionHealth": 22,
+    "conditionGrade": "COOKED - FOR PARTS",
+    "coreTier": "[CREATOR]",
+    "priceKsh": 45000,
+    "inStock": true
+  }
+]

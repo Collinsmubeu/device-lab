@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Device Lab 254 — Obsidian Dark-Mode Streetwear palette */
+  --color-canvas: #09090b;
+  --color-canvas-soft: #0f0f13;
+  --color-card: #141417;
+  --color-card-2: #1a1a1f;
+  --color-border: #27272a;
+  --color-border-soft: #3f3f46;
+  --color-neon: #22c55e;
+  --color-neon-dim: #1a8e3a;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-text: #f3f4f6;
+  --color-text-dim: #9ca3af;
+  --color-text-dim2: #777782;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@layer base {
+  /* Strict monospace — no serif fallback leakage across the storefront. */
+  html {
+    font-feature-settings: "liga" 1, "calt" 1;
+  }
+}
+
+/* Terminal-style monochrome scrollbars — industrial, not distracting. */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-card);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neon);
+}
