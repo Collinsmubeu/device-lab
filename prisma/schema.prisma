@@ -12,7 +12,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
@@ -90,7 +89,7 @@ model AuditLog {
   staff     User     @relation(fields: [staffId], references: [id], onDelete: Cascade)
 
   @@index([staffId])
-  @@index([timestamp(sort: desc)])
+  @@index([timestamp(sort: Desc)])
 }
 
 /// M-Pesa accounting ledger — one row per payment attempt.
@@ -103,5 +102,5 @@ model Transaction {
   createdAt    DateTime          @default(now())
 
   @@index([status])
-  @@index([createdAt(sort: desc)])
+  @@index([createdAt(sort: Desc)])
 }

@@ -1,15 +1,9 @@
 import { randomUUID } from "node:crypto";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import {
-  BRAND_BASE_KSH,
-  COOKED_THRESHOLD,
-  MIN_YEAR_FACTOR,
-  PROCESSOR_TIER,
-  RAM_BONUS_PER_8GB,
-  STORAGE_BONUS_PER_256GB,
-  YEAR_DEPRECATION_RATE,
-} from "@/lib/config";
+import { db } from "@/lib/db";
+import { TransactionType, TransactionStatus } from "@prisma/client";
+import { BRAND_BASE_KSH, PROCESSOR_TIER } from "@/lib/config";
 
 export interface QuoteRequest {
   brand: string;
@@ -35,42 +29,31 @@ export interface QuoteResponse {
   breakdown: QuoteBreakdown[];
 }
 
-function clamp(n: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, n));
-}
+const CURRENT_YEAR = new Date().getFullYear();
+const COOKED_THRESHOLD = 0.3;
 
-/**
- * Valuation parameters are centralized in `@/lib/config` so the payout
- * matrix can be retuned without touching business logic.
- *   value = (brandBase * processorTier + ramBoost + storageBoost)
- *           * yearFactor * conditionMultiplier
- * "Cooked" devices (condition <= COOKED_THRESHOLD) are sharply deducted —
- * the condition multiplier never exceeds 0.5 in the cooked band.
- */
 function calculateQuote(req: QuoteRequest): QuoteResponse {
   const breakdown: QuoteBreakdown[] = [];
 
-  const base = BRAND_BASE_KSH[req.brand] ?? BRAND_BASE_KSH["Dell"]!;
+  const base = BRAND_BASE_KSH[req.brand] ?? BRAND_BASE_KSH["Dell"];
   breakdown.push({ label: "Brand baseline", amount: base });
 
   const tier = PROCESSOR_TIER[req.processor] ?? 0.9;
   const tiered = Math.round(base * tier);
-  breakdown.push({ label: "Processor tier", amount: tiered - base });
+  breakdown.push({ label: "Processor tier modifier", amount: tiered - base });
 
-  const ramSteps = Math.max(0, Math.floor((req.ramGB - 8) / 8));
-  const ramBoost = ramSteps * RAM_BONUS_PER_8GB;
+  const ramBoost = Math.max(0, req.ramGB - 8) * 1500;
   if (ramBoost) breakdown.push({ label: `RAM (${req.ramGB} GB)`, amount: ramBoost });
 
-  const storageSteps = Math.max(0, Math.floor((req.storageGB - 256) / 256));
-  const storageBoost = storageSteps * STORAGE_BONUS_PER_256GB;
+  const storageSteps = Math.max(0, Math.floor(req.storageGB / 1024));
+  const storageBoost = storageSteps * 10000;
   if (storageBoost) breakdown.push({ label: `Storage (${req.storageGB} GB)`, amount: storageBoost });
 
-  const currentYear = new Date().getFullYear();
-  const age = Math.max(0, currentYear - req.year);
-  const yearFactor = age === 0 ? 1 : Math.max(0.2, 1 - age * YEAR_DEPRECATION_RATE);
+  const age = Math.max(0, CURRENT_YEAR - req.year);
+  const yearFactor = age === 0 ? 1 : Math.max(0.2, 1 - age * 0.1);
   const yearDeduction = Math.round((1 - yearFactor) * 100);
   breakdown.push({
-    label: `Depreciation (${age}yr old, -${yearDeduction}%)`,
+    label: `Year depreciation (-${yearDeduction}% for ${age}yr)`,
     amount: 0,
   });
 
@@ -78,28 +61,33 @@ function calculateQuote(req: QuoteRequest): QuoteResponse {
   subtotal = Math.round(subtotal * yearFactor);
   breakdown.push({ label: "Subtotal (pre-condition)", amount: subtotal });
 
-  const ratio = clamp(req.condition, 0, 100) / 100;
+  const ratio = req.condition / 100;
   const cooked = ratio <= COOKED_THRESHOLD;
-  // Cooked band ramps 0%→0.5; above it ramps 0.5→1.0 (smooth, flat 50% at the cooked border).
   const conditionMultiplier =
     ratio <= COOKED_THRESHOLD
-      ? (ratio / COOKED_THRESHOLD) * 0.5
-      : 0.5 + 0.5 * ((ratio - COOKED_THRESHOLD) / (1 - COOKED_THRESHOLD));
+      ? 0.3
+      : ratio < 0.5
+      ? 0.7
+      : ratio < 0.8
+      ? 1.0
+      : 1.2;
+
   breakdown.push({
-    label: `Condition (${cooked ? "COOKED" : "OK"}) x${conditionMultiplier.toFixed(2)}`,
+    label: `Condition x${conditionMultiplier.toFixed(2)} (${cooked ? "COOKED" : "OK"})`,
     amount: 0,
   });
 
   const value = Math.max(Math.round(subtotal * conditionMultiplier), 0);
   breakdown.push({ label: "TOTAL PAYOUT", amount: value });
 
-  const nairobi = new Date(Date.now() + 3 * 3600 * 1000).toISOString();
+  const now = new Date(Date.now() + 3 * 3600 * 1000);
+  const nairobiISO = now.toISOString();
 
   return {
     value,
     valueFormatted: `KSh ${value.toLocaleString("en-KE")}`,
     reference: `DL254-${randomUUID().toUpperCase().slice(0, 12)}`,
-    timestamp: nairobi,
+    timestamp: nairobiISO,
     cooked,
     breakdown,
   };
@@ -140,6 +128,19 @@ export async function POST(request: NextRequest) {
     storageGB: b.storageGB,
     condition: b.condition,
   });
+
+  try {
+    await db.transaction.create({
+      data: {
+        amount: quote.value,
+        status: TransactionStatus.PENDING,
+        type: quote.cooked ? TransactionType.CASH_OUT_TRADEIN : TransactionType.CASH_IN_SALE,
+        mpesaReceipt: null,
+      },
+    });
+  } catch (dbError) {
+    console.error("[SYS_DB] // Quote logging failed:", dbError);
+  }
 
   return NextResponse.json(quote, { status: 200 });
 }

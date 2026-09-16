@@ -1,46 +1,68 @@
+import Navbar from "@/app/components/Navbar";
+import HeroSection from "@/app/components/HeroSection";
 import LaptopCatalog from "@/app/components/LaptopCatalog";
 import QuoteEngine from "@/app/components/QuoteEngine";
 
+/**
+ * Device Lab 254 — Home Page (Server Component)
+ *
+ * Assembles the obsidian streetwear storefront: sticky nav, hero,
+ * bento catalog, cash-out engine, and industrial footer.
+ */
 export default function Home() {
   return (
     <>
-      <header className="border-b border-border bg-card/60 px-6 py-5 sm:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-xs tracking-[0.25em] text-text-dim uppercase">
-            Device Lab 254 — Nairobi
-          </p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-text sm:text-3xl">
-            PREMIUM REFLINED HARDWARE
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-text-dim">
-            Obsidian-vetted laptops. Street-tested. Vault-grade where it counts.
-          </p>
-        </div>
-      </header>
+      <Navbar />
 
-      <main className="mx-auto max-w-7xl space-y-16 px-6 py-10 sm:px-8">
-        <section aria-labelledby="catalog-heading">
-          <h2 id="catalog-heading" className="sr-only">
-            Current stock
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <HeroSection />
+
+        <section
+          id="marketplace"
+          aria-labelledby="marketplace-heading"
+          className="mt-16"
+        >
+          <h2
+            id="marketplace-heading"
+            className="mb-6 text-xs font-medium uppercase tracking-wider text-text-dim"
+          >
+            Current Drops
           </h2>
           <LaptopCatalog />
         </section>
 
-        <section aria-labelledby="quote-heading">
+        <section
+          id="cash-out"
+          aria-labelledby="cash-out-heading"
+          className="mt-16"
+        >
           <h2
-            id="quote-heading"
-            className="mb-4 text-xs tracking-[0.25em] text-text-dim uppercase"
+            id="cash-out-heading"
+            className="mb-6 text-xs font-medium uppercase tracking-wider text-text-dim"
           >
-            OFFLOAD YOUR RIG
+            Offload Your Rig
           </h2>
           <QuoteEngine />
         </section>
       </main>
 
-      <footer className="border-t border-border bg-card/60 px-6 py-6 text-center text-xs text-text-dim">
-        <p className="font-mono">
-          &copy; {new Date().getFullYear()} Device Lab 254 — KSh all in.
-        </p>
+      {/* ── Industrial Footer Matrix ── */}
+      <footer className="border-t border-border bg-card/60 px-6 py-8 font-mono">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
+            <div className="space-y-1 text-xs text-text-dim">
+              <p>{"// STATUS: SYSTEMS_NOMINAL"}</p>
+              <p>{"// LOCATION: NAIROBI_KENYA"}</p>
+            </div>
+
+            <a
+              href="/admin"
+              className="text-[10px] uppercase tracking-wider text-text-dim transition-colors hover:text-neon"
+            >
+              [ ADMINISTRATIVE_PORTAL ]
+            </a>
+          </div>
+        </div>
       </footer>
     </>
   );
