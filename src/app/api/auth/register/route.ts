@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { db } from "@/lib/db";
 import { Prisma, UserRole as PrismaUserRole } from "@prisma/client";
 
-const OWNER_EMAIL = "cmubeu@gmail.com";
+const OWNER_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase() ?? "cmubeu@gmail.com";
 
 function resolveRole(email: string): PrismaUserRole {
   return email.trim().toLowerCase() === OWNER_EMAIL

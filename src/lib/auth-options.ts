@@ -22,7 +22,7 @@ declare module "next-auth" {
   }
 }
 
-const OWNER_EMAIL = "cmubeu@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase() ?? "cmubeu@gmail.com";
 
 export type { Session };
 
@@ -110,7 +110,7 @@ export const authOptions: AuthOptions = {
     async signIn({ account, profile }) {
       if (account?.provider === "google" && profile?.email) {
         const email = profile.email.toLowerCase();
-        const role = email === OWNER_EMAIL ? "OWNER" : "CUSTOMER";
+        const role = email === ADMIN_EMAIL ? "OWNER" : "CUSTOMER";
 
         const existingUser = await db.user.findUnique({ where: { email } });
         if (!existingUser) {

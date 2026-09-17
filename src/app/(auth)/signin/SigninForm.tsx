@@ -11,7 +11,8 @@ const ROLE_ROUTES: Record<Role, string> = {
   CUSTOMER: "/customer/dashboard",
 };
 
-const DEV_OWNER_EMAILS = ["cmubeu@gmail.com", "owner@device254.dev"];
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase() ?? "owner@device254.dev";
+const DEV_OWNER_EMAILS = ["cmubeu@gmail.com", ADMIN_EMAIL];
 const DEV_WORKER_EMAILS = ["worker@device254.dev"];
 
 export default function SigninForm() {
@@ -207,7 +208,7 @@ export default function SigninForm() {
           <p className="mb-1 uppercase tracking-wider text-warning">
             [ DEV_ACCESS // QUICK_LOGIN ]
           </p>
-          <p>{roleLabels.OWNER}: owner@device254.dev / lab254-rock</p>
+          <p>{roleLabels.OWNER}: {ADMIN_EMAIL} / lab254-rock</p>
           <p>{roleLabels.WORKER}: worker@device254.dev / work254-pass</p>
           <p>{roleLabels.CUSTOMER}: client@device254.dev / client254-pass</p>
         </div>
