@@ -112,7 +112,7 @@ function formatKsh(value: number): string {
 
 const GRADE_TONE: Record<ConditionGrade, string> = {
   "VAULT-CONDITION": "text-neon",
-  MINT: "text-warning",
+  MINT: "text-info",
   GOOD: "text-warning",
   "COOKED - FOR PARTS": "text-danger",
 };
@@ -122,7 +122,7 @@ function DeviceSilhouette({ brand }: { brand: string }) {
     brand === "Apple"
       ? "bg-neon"
       : brand === "ASUS"
-      ? "bg-neon"
+      ? "bg-info"
       : brand === "Lenovo"
       ? "bg-warning"
       : "bg-danger";
@@ -161,10 +161,10 @@ export default function BentoCatalog() {
         <article
           key={lap.id}
           onMouseEnter={() => setFocused(lap.id)}
-          className={`group relative min-h-[460px] h-full w-full cursor-pointer rounded-xl border border-border bg-card p-4 shadow-inner transition-all duration-300 ease-out font-mono ${
+          className={`group relative min-h-[460px] h-full w-full cursor-pointer rounded-xl border border-border bg-gradient-card p-4 transition-all duration-300 ease-out font-mono shadow-inner ${
             lap.inStock
               ? "hover:border-emerald-500 hover:shadow-[0_0_22px_theme(colors.neon)] focus-within:border-emerald-500 focus-within:shadow-[0_0_22px_theme(colors.neon)]"
-              : "hover:border-red-600 hover:bg-red-950/10 focus-within:border-red-600 focus-within:bg-red-950/10"
+              : "hover:border-red-600 hover:bg-red-950/5 focus-within:border-red-600 focus-within:bg-red-950/5"
           } ${i === 0 ? "sm:col-span-2" : ""} ${i === 1 ? "lg:col-span-2" : ""}`}
         >
           {/* Top Wrapper: metadata badges, brand, model, description */}

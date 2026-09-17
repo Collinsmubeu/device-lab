@@ -124,13 +124,14 @@ export default function Home() {
       <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-canvas font-mono text-text">
         {/* Grid mesh backdrop */}
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0"
           style={{
             backgroundImage: `
               linear-gradient(to right, theme(colors.border) 1px, transparent 1px),
               linear-gradient(to bottom, theme(colors.border) 1px, transparent 1px)
             `,
             backgroundSize: "44px 44px",
+            opacity: 0.15,
           }}
           aria-hidden="true"
         />
@@ -140,7 +141,7 @@ export default function Home() {
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(circle at center, transparent 30%, theme(colors.canvas) 85%)",
+              "radial-gradient(circle at center, transparent 30%, theme(colors.canvas) 85%), radial-gradient(circle at 70% 70%, color-mix(in oklab, var(--info) 4%, transparent) 0%, transparent 50%)",
           }}
           aria-hidden="true"
         />
@@ -160,7 +161,7 @@ export default function Home() {
           {/* Progress bar */}
           <div className="mt-10 h-1.5 w-full max-w-xl overflow-hidden rounded-full border border-border bg-card">
             <div
-              className="h-full bg-neon transition-[width] duration-300 ease-out"
+              className="h-full bg-gradient-to-r from-neon via-info to-purple transition-[width] duration-300 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -168,7 +169,7 @@ export default function Home() {
           {/* Rotating computer accessory visual */}
           <div
             key={streamIndex}
-            className="mt-8 flex h-40 w-full max-w-xl animate-in fade-in slide-in-from-bottom-3 items-center justify-center rounded-xl border border-border bg-card/60 px-6"
+            className="mt-8 flex h-40 w-full max-w-xl animate-in fade-in slide-in-from-bottom-3 items-center justify-center rounded-xl border border-border bg-gradient-card px-6"
           >
             {ACCESSORIES[streamIndex].node}
           </div>
@@ -200,7 +201,7 @@ export default function Home() {
             setProgress(100);
             setBypassed(true);
           }}
-          className="absolute bottom-6 right-6 z-20 rounded border border-border bg-card/60 px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-text-dim transition-colors hover:border-neon hover:text-neon"
+          className="absolute bottom-6 right-6 z-20 rounded border border-border bg-card/60 px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-text-dim transition-all duration-200 hover:border-info hover:text-info hover:shadow-info-glow"
         >
           [ BYPASS_INTRO ]
         </button>
@@ -222,39 +223,39 @@ export default function Home() {
         >
           <h2
             id="marketplace-heading"
-            className="mb-6 text-xs font-medium uppercase tracking-wider text-text-dim"
+            className="mb-6 text-xs font-medium uppercase tracking-wider text-info"
           >
             Current Drops
           </h2>
           <LaptopCatalog />
         </section>
 
-        <section
-          id="cash-out"
-          aria-labelledby="cash-out-heading"
-          className="mt-16"
+      <section
+        id="cash-out"
+        aria-labelledby="cash-out-heading"
+        className="mt-16"
+      >
+        <h2
+          id="cash-out-heading"
+          className="mb-6 text-xs font-medium uppercase tracking-wider text-purple"
         >
-          <h2
-            id="cash-out-heading"
-            className="mb-6 text-xs font-medium uppercase tracking-wider text-text-dim"
-          >
-            Offload Your Rig
-          </h2>
-          <p className="text-xs text-text-dim">
-            Route your used hardware through the dedicated trade-in terminal for an
-            instant, transparent valuation.
-          </p>
-          <a
-            href="/trade-in"
-            className="mt-4 inline-flex rounded border border-neon bg-neon/10 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-wider text-neon transition-colors hover:bg-neon/20"
-          >
-            [ OPEN_TRADE_IN_TERMINAL ]
-          </a>
-        </section>
+          Offload Your Rig
+        </h2>
+        <p className="text-xs text-text-dim">
+          Route your used hardware through the dedicated trade-in terminal for an
+          instant, transparent valuation.
+        </p>
+        <a
+          href="/trade-in"
+          className="mt-4 inline-flex rounded border border-info bg-info/10 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-wider text-info transition-all duration-200 hover:bg-info/20 hover:shadow-info-glow"
+        >
+          [ OPEN_TRADE_IN_TERMINAL ]
+        </a>
+      </section>
       </main>
 
       {/* Industrial Footer Matrix */}
-      <footer className="border-t border-border bg-card/60 px-6 py-8 font-mono">
+      <footer className="border-t border-border bg-gradient-card px-6 py-8 font-mono">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
             <div className="space-y-1 text-xs text-text-dim">
@@ -264,7 +265,7 @@ export default function Home() {
 
             <a
               href="/admin"
-              className="text-[10px] uppercase tracking-wider text-text-dim transition-colors hover:text-neon"
+              className="text-[10px] uppercase tracking-wider text-text-dim transition-colors hover:text-info"
             >
               [ ADMINISTRATIVE_PORTAL ]
             </a>

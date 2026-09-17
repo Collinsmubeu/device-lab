@@ -11,6 +11,10 @@
   --color-neon-dim: #1a8e3a;
   --color-danger: #ef4444;
   --color-warning: #f59e0b;
+  --color-info: #38bdf8;
+  --color-info-dim: #0ea5e9;
+  --color-purple: #a855f7;
+  --color-pink: #ec4899;
   --color-text: #f3f4f6;
   --color-text-dim: #9ca3af;
   --color-text-dim2: #777782;
@@ -21,54 +25,78 @@
 
 :root {
   --background: #09090b;
+  --background-soft: #0f0f13;
   --card: #141417;
+  --card-2: #1a1a1f;
   --border: #27272a;
+  --border-soft: #3f3f46;
   --accent: #22c55e;
-  --text: #ffffff;
-  --text-dim: #9ca3af;
-  --text-dim2: #777782;
-  --neon-dim: #1a8e3a;
+  --accent-dim: #1a8e3a;
   --danger: #ef4444;
   --warning: #f59e0b;
+  --info: #38bdf8;
+  --purple: #a855f7;
+  --pink: #ec4899;
+  --text: #f3f4f6;
+  --text-dim: #9ca3af;
+  --text-dim2: #777782;
 }
 
 .obsidian {
   --background: #09090b;
+  --background-soft: #0f0f13;
   --card: #141417;
+  --card-2: #1a1a1f;
   --border: #27272a;
+  --border-soft: #3f3f46;
   --accent: #22c55e;
-  --text: #ffffff;
-  --text-dim: #9ca3af;
-  --text-dim2: #777782;
-  --neon-dim: #1a8e3a;
+  --accent-dim: #1a8e3a;
   --danger: #ef4444;
   --warning: #f59e0b;
+  --info: #38bdf8;
+  --purple: #a855f7;
+  --pink: #ec4899;
+  --text: #f3f4f6;
+  --text-dim: #9ca3af;
+  --text-dim2: #777782;
 }
 
 .matrix {
   --background: #ffffff;
+  --background-soft: #f4f4f5;
   --card: #f4f4f5;
+  --card-2: #e7e7ec;
   --border: #000000;
+  --border-soft: #3f3f46;
   --accent: #000000;
+  --accent-dim: #000000;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #38bdf8;
+  --purple: #a855f7;
+  --pink: #ec4899;
   --text: #09090b;
   --text-dim: #3f3f46;
   --text-dim2: #52525b;
-  --neon-dim: #000000;
-  --danger: #ef4444;
-  --warning: #f59e0b;
 }
 
 .friendly {
   --background: #000000;
+  --background-soft: #0a0a0a;
   --card: #121212;
+  --card-2: #1a1a1a;
   --border: #facc15;
+  --border-soft: #eab308;
   --accent: #eab308;
+  --accent-dim: #ca8a04;
+  --danger: #f87171;
+  --warning: #fde047;
+  --info: #93c5fd;
+  --purple: #c084fc;
+  --pink: #fb7185;
   --text: #ffffff;
   --text-dim: #fde047;
   --text-dim2: #facc15;
-  --neon-dim: #ca8a04;
-  --danger: #f87171;
-  --warning: #fde047;
 }
 
 html {
@@ -122,6 +150,16 @@ body {
 }
 
 @layer utilities {
+  .bg-gradient-card {
+    background: linear-gradient(135deg, var(--card) 0%, var(--card-2) 100%);
+  }
+  .bg-gradient-hero {
+    background: radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--info) 8%, transparent) 0%, transparent 60%),
+      radial-gradient(circle at 50% 100%, color-mix(in oklab, var(--purple) 6%, transparent) 0%, transparent 60%);
+  }
+  .bg-gradient-canvas {
+    background: linear-gradient(160deg, var(--background) 0%, var(--background-soft) 100%);
+  }
   .hover-bg-neon\/20:hover {
     background-color: color-mix(in oklab, var(--color-neon) 20%, transparent);
   }
@@ -131,13 +169,31 @@ body {
   .hover-bg-warning\/20:hover {
     background-color: color-mix(in oklab, var(--color-warning) 20%, transparent);
   }
+  .hover-bg-info\/20:hover {
+    background-color: color-mix(in oklab, var(--color-info) 20%, transparent);
+  }
+  .hover-bg-purple\/20:hover {
+    background-color: color-mix(in oklab, var(--color-purple) 20%, transparent);
+  }
   .shadow-neon-glow {
     box-shadow: 0 0 10px var(--color-neon), 0 0 20px var(--color-neon);
+  }
+  .shadow-neon-glow-lg {
+    box-shadow: 0 0 15px var(--color-neon), 0 0 30px var(--color-neon), 0 0 45px color-mix(in oklab, var(--color-neon) 50%, transparent);
   }
   .shadow-danger-glow {
     box-shadow: 0 0 10px var(--color-danger), 0 0 20px var(--color-danger);
   }
   .shadow-warning-glow {
     box-shadow: 0 0 10px var(--color-warning), 0 0 20px var(--color-warning);
+  }
+  .shadow-info-glow {
+    box-shadow: 0 0 10px var(--color-info), 0 0 20px var(--color-info);
+  }
+  .shadow-purple-glow {
+    box-shadow: 0 0 10px var(--color-purple), 0 0 20px var(--color-purple);
+  }
+  .text-balance {
+    text-wrap: balance;
   }
 }

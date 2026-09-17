@@ -69,7 +69,7 @@ export default function Navbar() {
           </Link>
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon opacity-75"></span>
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-neon"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-info"></span>
           </span>
           <span className="hidden text-xs text-text-dim lg:inline">
             LIVE_INTAKE_OPEN
