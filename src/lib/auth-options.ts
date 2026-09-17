@@ -5,6 +5,8 @@ import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase() ?? "cmubeu@gmail.com";
+
 declare module "next-auth" {
   interface Session {
     user: {
@@ -22,8 +24,6 @@ declare module "next-auth" {
   }
 }
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase() ?? "cmubeu@gmail.com";
-
 export type { Session };
 
 export const authOptions: AuthOptions = {
@@ -32,6 +32,7 @@ export const authOptions: AuthOptions = {
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+      allowDangerousEmailAccountLinking: true,
     }),
     Credentials({
       name: "credentials",
@@ -87,11 +88,15 @@ export const authOptions: AuthOptions = {
     maxAge: 8 * 60 * 60,
   },
   callbacks: {
-    async jwt({ token, account, user }) {
-      if (account && user) {
-        token.accessToken = account.access_token;
+    async jwt({ token, user, account }) {
+      if (user) {
         token.id = user.id;
-        token.role = (user as { role?: string }).role;
+        token.role = (user as { role?: string })?.role;
+      }
+      // Ensure role is set for Google users based on email
+      if (account?.provider === "google" && token.email) {
+        const emailLower = token.email.toLowerCase();
+        token.role = emailLower === ADMIN_EMAIL ? "OWNER" : "CUSTOMER";
       }
       return token as JWT;
     },
@@ -108,22 +113,42 @@ export const authOptions: AuthOptions = {
       return baseUrl;
     },
     async signIn({ account, profile }) {
-      if (account?.provider === "google" && profile?.email) {
-        const email = profile.email.toLowerCase();
-        const role = email === ADMIN_EMAIL ? "OWNER" : "CUSTOMER";
+      try {
+        if (!profile?.email) return true;
 
+        const email = profile.email.toLowerCase();
         const existingUser = await db.user.findUnique({ where: { email } });
-        if (!existingUser) {
-          await db.user.create({
-            data: {
-              email,
-              passwordHash: "",
-              role: role as "OWNER" | "WORKER" | "CUSTOMER",
+
+        // If user exists and account isn't linked yet, link it
+        if (existingUser && account) {
+          const existingAccount = await db.account.findFirst({
+            where: {
+              userId: existingUser.id,
+               providerAccountId: account.providerAccountId,
+              provider: account.provider,
             },
           });
+          if (!existingAccount) {
+            await db.account.create({
+              data: {
+                userId: existingUser.id,
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                access_token: account.access_token,
+                token_type: account.token_type,
+                scope: account.scope,
+                id_token: account.id_token,
+              },
+            });
+          }
         }
+
+        return true;
+      } catch (error) {
+        console.error("DEBUG AUTH COLLAPSE:", error);
+        return false;
       }
-      return true;
     },
   },
   pages: {

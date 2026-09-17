@@ -60,8 +60,7 @@ export default function SigninForm() {
   const handleGoogleSignIn = () => {
     setIsGoogleSubmitting(true);
     setFeedback("[ REDIRECTING // GOOGLE_OAUTH... ]");
-    // Use NextAuth's built-in Google sign-in endpoint
-    signIn("google", { callbackUrl: "/" });
+    signIn("google", { callbackUrl: "/api/auth/callback/role-redirect" });
   };
 
   const roleLabels: Record<Role, string> = {

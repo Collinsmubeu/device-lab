@@ -30,7 +30,10 @@
 - **Session middleware** (`middleware.ts`)
   - `/admin/**` → OWNER only
   - `/staff/**` → WORKER or OWNER
-  - `/customer/**`, `/checkout/**`, `/cash-out/**` → any authenticated user
+   - `/customer/**`, `/checkout/**`, `/cash-out/**` → any authenticated user
+   - Implemented via JWT token cookie parsing (no DB round-trip in middleware)
+   - Redirect unauthenticated users to `/signin?callbackUrl=<original_path>`
+   - Role-based access enforcement on protected routes
 
 ## Showroom Sections
 
