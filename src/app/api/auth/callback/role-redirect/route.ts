@@ -1,23 +1,25 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
-import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  const token = await getToken({ req: request });
 
-  if (!session?.user?.email) {
-    redirect("/signin");
+  if (!token?.email) {
+    return NextResponse.redirect(new URL("/signin", url));
   }
 
-  const role = session.user.role ?? "CUSTOMER";
+  const role = token.role as string | undefined;
+  const baseUrl = new URL("/", url);
 
   if (role === "OWNER") {
-    redirect("/admin/dashboard");
+    return NextResponse.redirect(new URL("/admin/dashboard", baseUrl));
   } else if (role === "WORKER") {
-    redirect("/staff/dashboard");
+    return NextResponse.redirect(new URL("/staff/dashboard", baseUrl));
   } else {
-    redirect("/customer/dashboard");
+    return NextResponse.redirect(new URL("/customer/dashboard", baseUrl));
   }
 }
