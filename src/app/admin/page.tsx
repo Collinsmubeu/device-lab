@@ -8,15 +8,16 @@
  */
 
 import { redirect } from "next/navigation";
-import { verifySession } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 import LiveDashboard from "./LiveDashboard";
+import { authOptions } from "@/lib/auth-options";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 export default async function AdminPage() {
-  const session = await verifySession();
-  if (!session || session.role !== "OWNER") {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "OWNER") {
     redirect("/signin");
   }
 

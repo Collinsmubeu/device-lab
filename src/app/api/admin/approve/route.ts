@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { TransactionStatus } from "@prisma/client";
-import { verifySession } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
 export async function POST(request: Request) {
-  const session = await verifySession();
-  if (!session || session.role !== "OWNER") {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "OWNER") {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 403 },
@@ -36,8 +37,8 @@ export async function POST(request: Request) {
     await db.auditLog.create({
       data: {
         action: `remote_payout_${action.toLowerCase()}`,
-        details: `Admin ${session.userId} ${action.toLowerCase()}d transaction ${id} for KSh ${transaction.amount.toLocaleString("en-KE")}`,
-        staff: { connect: { id: session.userId } },
+        details: `Admin ${session.user?.id ?? "unknown"} ${action.toLowerCase()}d transaction ${id} for KSh ${transaction.amount.toLocaleString("en-KE")}`,
+        staff: { connect: { id: session.user?.id ?? "" } },
       },
     });
 

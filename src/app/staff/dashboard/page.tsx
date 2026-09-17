@@ -8,7 +8,8 @@
  */
 
 import { redirect } from "next/navigation";
-import { verifySession } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 import { db } from "@/lib/db";
 import {
   ConditionGrade,
@@ -54,12 +55,12 @@ async function getDashboardData(userId: string) {
 }
 
 export default async function StaffDashboard() {
-  const session = await verifySession();
-  if (!session || session.role !== "WORKER") {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "WORKER") {
     redirect("/signin");
   }
 
-  const data = await getDashboardData(session.userId);
+   const data = await getDashboardData(session.user?.id ?? "");
 
   return (
     <main className="min-h-screen w-full bg-canvas font-mono text-text">
@@ -95,7 +96,7 @@ export default async function StaffDashboard() {
           </h2>
 
           <form action={createLaptopAction} className="grid gap-4 sm:grid-cols-2">
-            <input type="hidden" name="staffId" value={session.userId} />
+            <input type="hidden" name="staffId" value={session.user?.id} />
 
             <div>
               <label className="block text-[10px] uppercase tracking-wider text-text-dim">
@@ -324,7 +325,7 @@ function KanbanCard({
 async function createLaptopAction(formData: FormData) {
   "use server";
 
-  const session = await verifySession();
+  const session = await getServerSession(authOptions);
   if (!session) return;
 
   const brand = formData.get("brand")?.toString() ?? "";
@@ -358,7 +359,7 @@ async function createLaptopAction(formData: FormData) {
     data: {
       action: "created_laptop_entry",
       details: `${laptop.brand} ${laptop.model} #${laptop.id.slice(0, 8)}`,
-      staffId: session.userId,
+      staffId: session.user?.id ?? "",
     },
   });
 
@@ -369,7 +370,7 @@ async function dispatchCompleteAction(formData: FormData) {
   "use server";
 
   const id = formData.get("id")?.toString() ?? "";
-  const session = await verifySession();
+  const session = await getServerSession(authOptions);
 
   if (!session) return;
 
@@ -382,7 +383,7 @@ async function dispatchCompleteAction(formData: FormData) {
     data: {
       action: "dispatched_laptop",
       details: `laptop ${id.slice(0, 8)} marked SOLD and dispatched for Nairobi delivery`,
-      staffId: session.userId,
+      staffId: session.user?.id ?? "",
     },
   });
 

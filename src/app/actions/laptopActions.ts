@@ -12,7 +12,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { LaptopStatus, TransactionStatus, TransactionType } from "@prisma/client";
 import type { AuditLog, Laptop, Transaction } from "@prisma/client";
-import { verifySession } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 import { PAYOUT_OVERRIDE_FLOOR_KSH } from "@/lib/config";
 
 export interface SystemMetrics {
@@ -113,9 +114,9 @@ export async function toggleRemoteApproval(
   transactionId: string,
   action: "APPROVE" | "TERMINATE",
 ): Promise<ApprovalResult> {
-  const session = await verifySession();
+  const session = await getServerSession(authOptions);
 
-  if (!session || session.role !== "OWNER") {
+  if (!session || session.user?.role !== "OWNER") {
     return {
       success: false,
       message: "[ ACCESS_DENIED // NOT_AUTHORIZED ]",
@@ -136,8 +137,8 @@ export async function toggleRemoteApproval(
     await db.auditLog.create({
       data: {
         action: `remote_payout_${action.toLowerCase()}`,
-        details: `Admin ${session.userId} ${action.toLowerCase()}d transaction ${transactionId} for KSh ${transaction.amount.toLocaleString("en-KE")}`,
-        staffId: session.userId,
+        details: `Admin ${session.user?.id ?? "unknown"} ${action.toLowerCase()}d transaction ${transactionId} for KSh ${transaction.amount.toLocaleString("en-KE")}`,
+        staffId: session.user?.id ?? "",
       },
     });
 

@@ -8,7 +8,8 @@
  */
 
 import { redirect } from "next/navigation";
-import { verifySession } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 import { db } from "@/lib/db";
 import { LaptopStatus, TransactionStatus } from "@prisma/client";
 
@@ -57,7 +58,7 @@ async function getCustomerData() {
 }
 
 export default async function CustomerDashboard() {
-  const session = await verifySession();
+  const session = await getServerSession(authOptions);
   if (!session) {
     redirect("/signin");
   }
@@ -74,7 +75,7 @@ export default async function CustomerDashboard() {
               [ DEVICE LAB 254 :: CUSTOMER VAULT ]
             </span>
             <span className="hidden text-xs text-text-dim sm:inline">
-              client: <span className="text-text">{session.email}</span>
+              client: <span className="text-text">{session.user?.email}</span>
             </span>
           </div>
           <span className="text-[10px] text-text-dim">

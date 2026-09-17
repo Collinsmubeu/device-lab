@@ -8,7 +8,8 @@
  */
 
 import { redirect } from "next/navigation";
-import { verifySession } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 import { db } from "@/lib/db";
 import { TransactionStatus, TransactionType, UserRole, LaptopStatus } from "@prisma/client";
 import type { AuditLog, Transaction } from "@prisma/client";
@@ -72,8 +73,8 @@ async function getDashboardData() {
 }
 
 export default async function OwnerDashboard() {
-  const session = await verifySession();
-  if (!session || session.role !== "OWNER") {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "OWNER") {
     redirect("/signin");
   }
 
@@ -97,7 +98,7 @@ export default async function OwnerDashboard() {
               [ DEVICE LAB 254 :: OWNER COMMAND CENTER ]
             </span>
             <span className="hidden text-xs text-text-dim sm:inline">
-              operator: <span className="text-text">{session.email}</span>
+              operator: <span className="text-text">{session.user?.email}</span>
             </span>
           </div>
           <span className="text-[10px] text-text-dim">
