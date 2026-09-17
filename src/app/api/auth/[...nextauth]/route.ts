@@ -47,10 +47,10 @@ const handler = NextAuth({
 
         // Dev-only credential fallback
         if (process.env.NODE_ENV !== "production") {
-          const DEV_CREDS: Record<string, { password: string; role: "OWNER" | "CUSTOMER" }> = {
+          const DEV_CREDS: Record<string, { password: string; role: "OWNER" | "WORKER" | "CUSTOMER" }> = {
             "owner@device254.dev": { password: "lab254-rock", role: "OWNER" },
+            "worker@device254.dev": { password: "work254-pass", role: "WORKER" },
             "client@device254.dev": { password: "client254-pass", role: "CUSTOMER" },
-            "worker@device254.dev": { password: "work254-pass", role: "CUSTOMER" },
           };
 
           const devCred = DEV_CREDS[email];
@@ -59,7 +59,7 @@ const handler = NextAuth({
               id: `dev-${email}`,
               email,
               name: email.split("@")[0],
-              role: devCred.role === "OWNER" ? "OWNER" : "CUSTOMER",
+              role: devCred.role,
             };
           }
         }

@@ -32,10 +32,12 @@ export default function SigninForm() {
     setFeedback("[ SYS_VERIFYING // ACCESSING PORTAL_PERMISSIONS... ]");
 
     try {
+      const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl") || "/";
       const res = await signIn("credentials", {
         redirect: false,
         email,
         password,
+        callbackUrl,
       });
 
       if (res?.error) {
@@ -44,9 +46,7 @@ export default function SigninForm() {
         return;
       }
 
-      // Wait for session cookie to be set, then determine route
-      setFeedback("[ SESSION_INITIALIZED // ACCESS_GRANTED ]");
-
+      // Determine role from email for dev accounts
       const lowerEmail = email.toLowerCase();
       let role: Role = "CUSTOMER";
       if (DEV_OWNER_EMAILS.includes(lowerEmail)) {
@@ -56,9 +56,11 @@ export default function SigninForm() {
       }
 
       const route = ROLE_ROUTES[role];
+      setFeedback("[ SESSION_INITIALIZED // ACCESS_GRANTED ]");
+
       setTimeout(() => {
         router.push(route);
-      }, 800);
+      }, 600);
     } catch {
       setFeedback("[ ERROR // NETWORK_FAILURE ]");
     } finally {
