@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
-type AuthMode = "signin" | "register";
 type Role = "OWNER" | "WORKER" | "CUSTOMER";
 
 const ROLE_ROUTES: Record<Role, string> = {
@@ -13,11 +12,13 @@ const ROLE_ROUTES: Record<Role, string> = {
   CUSTOMER: "/customer/dashboard",
 };
 
+const DEV_OWNER_EMAILS = ["cmubeu@gmail.com", "owner@device254.dev"];
+const DEV_WORKER_EMAILS = ["worker@device254.dev"];
+
 export default function SigninForm() {
-  const searchParams = useSearchParams();
-  const [mode, setMode] = useState<AuthMode>(
-    searchParams.get("mode") === "register" ? "register" : "signin",
-  );
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const initialMode = searchParams?.get("mode") === "register" ? "register" : "signin";
+  const [mode, setMode] = useState<"signin" | "register">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,14 +40,25 @@ export default function SigninForm() {
 
       if (res?.error) {
         setFeedback("[ AUTHENTICATION_FAILED // INVALID_CREDENTIALS ]");
-      } else {
-        setFeedback("[ SESSION_INITIALIZED // ACCESS_GRANTED ]");
-        const role: Role = email.toLowerCase() === "cmubeu@gmail.com" ? "OWNER" : "CUSTOMER";
-        const route = ROLE_ROUTES[role];
-        setTimeout(() => {
-          router.push(route);
-        }, 800);
+        setIsSubmitting(false);
+        return;
       }
+
+      // Wait for session cookie to be set, then determine route
+      setFeedback("[ SESSION_INITIALIZED // ACCESS_GRANTED ]");
+
+      const lowerEmail = email.toLowerCase();
+      let role: Role = "CUSTOMER";
+      if (DEV_OWNER_EMAILS.includes(lowerEmail)) {
+        role = "OWNER";
+      } else if (DEV_WORKER_EMAILS.includes(lowerEmail)) {
+        role = "WORKER";
+      }
+
+      const route = ROLE_ROUTES[role];
+      setTimeout(() => {
+        router.push(route);
+      }, 800);
     } catch {
       setFeedback("[ ERROR // NETWORK_FAILURE ]");
     } finally {
@@ -54,10 +66,17 @@ export default function SigninForm() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     setIsGoogleSubmitting(true);
     setFeedback("[ REDIRECTING // GOOGLE_OAUTH... ]");
-    await signIn("google", { callbackUrl: "/" });
+    // Use NextAuth's built-in Google sign-in endpoint
+    signIn("google", { callbackUrl: "/" });
+  };
+
+  const roleLabels: Record<Role, string> = {
+    OWNER: "OWNER",
+    WORKER: "WORKER",
+    CUSTOMER: "CLIENT",
   };
 
   return (
@@ -198,9 +217,9 @@ export default function SigninForm() {
           <p className="mb-1 uppercase tracking-wider text-warning">
             [ DEV_ACCESS // QUICK_LOGIN ]
           </p>
-          <p>OWNER: owner@device254.dev / lab254-rock</p>
-          <p>WORKER: worker@device254.dev / work254-pass</p>
-          <p>CLIENT: client@device254.dev / client254-pass</p>
+          <p>{roleLabels.OWNER}: owner@device254.dev / lab254-rock</p>
+          <p>{roleLabels.WORKER}: worker@device254.dev / work254-pass</p>
+          <p>{roleLabels.CUSTOMER}: client@device254.dev / client254-pass</p>
         </div>
       </div>
     </div>
