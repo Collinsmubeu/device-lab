@@ -2,15 +2,10 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 type AuthMode = "signin" | "register";
 type Role = "OWNER" | "WORKER" | "CUSTOMER";
-
-interface AuthResponse {
-  message: string;
-  role?: Role;
-  email?: string;
-}
 
 const ROLE_ROUTES: Record<Role, string> = {
   OWNER: "/admin/dashboard",
@@ -26,6 +21,7 @@ export default function SigninForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const router = useRouter();
 
@@ -34,35 +30,34 @@ export default function SigninForm() {
     setIsSubmitting(true);
     setFeedback("[ SYS_VERIFYING // ACCESSING PORTAL_PERMISSIONS... ]");
 
-    const endpoint = mode === "signin" ? "/api/auth/login" : "/api/auth/register";
-    const payload = { email, password };
-
     try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
       });
 
-      const data: AuthResponse = await res.json();
-
-      if (res.ok) {
-        setFeedback(data.message);
-
-        if (mode === "signin" && data.role) {
-          const route = ROLE_ROUTES[data.role];
-          setTimeout(() => {
-            router.push(route);
-          }, 800);
-        }
+      if (res?.error) {
+        setFeedback("[ AUTHENTICATION_FAILED // INVALID_CREDENTIALS ]");
       } else {
-        setFeedback(data.message || "[ ERROR // UNKNOWN_RESPONSE ]");
+        setFeedback("[ SESSION_INITIALIZED // ACCESS_GRANTED ]");
+        const role: Role = email.toLowerCase() === "cmubeu@gmail.com" ? "OWNER" : "CUSTOMER";
+        const route = ROLE_ROUTES[role];
+        setTimeout(() => {
+          router.push(route);
+        }, 800);
       }
     } catch {
       setFeedback("[ ERROR // NETWORK_FAILURE ]");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleSubmitting(true);
+    setFeedback("[ REDIRECTING // GOOGLE_OAUTH... ]");
+    await signIn("google", { callbackUrl: "/" });
   };
 
   return (
@@ -111,7 +106,7 @@ export default function SigninForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isGoogleSubmitting}
               className="mt-1 w-full rounded border-2 border-border bg-card px-3 py-2 text-sm text-text font-mono placeholder:text-text-dim focus:border-neon focus:outline-none"
               placeholder="owner@device254.dev"
               required
@@ -126,7 +121,7 @@ export default function SigninForm() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isGoogleSubmitting}
               className="mt-1 w-full rounded border-2 border-border bg-card px-3 py-2 text-sm text-text font-mono placeholder:text-text-dim focus:border-neon focus:outline-none"
               placeholder="••••••"
               required
@@ -141,7 +136,7 @@ export default function SigninForm() {
 
           <button
             type="submit"
-            disabled={isSubmitting || !email || !password}
+            disabled={isSubmitting || isGoogleSubmitting || !email || !password}
             className="w-full rounded border border-neon bg-neon/10 py-3 text-[13px] font-mono font-bold text-neon uppercase tracking-wider transition hover:bg-neon/20 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {mode === "signin"
@@ -150,7 +145,7 @@ export default function SigninForm() {
           </button>
         </form>
 
-        {feedback && !isSubmitting && (
+        {feedback && !isSubmitting && !isGoogleSubmitting && (
           <div
             className={`rounded border px-3 py-2 text-[11px] font-mono ${
               feedback.includes("SUCCESS") || feedback.includes("GRANTED")
@@ -171,11 +166,12 @@ export default function SigninForm() {
         </div>
 
         {/* Google OAuth */}
-        <form action="/api/auth/google" method="get">
-          <button
-            type="submit"
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded border border-border bg-card px-3 py-2 text-[11px] font-mono font-bold uppercase tracking-wider text-text-dim transition-all duration-200 hover:border-info hover:text-info hover:shadow-info-glow"
-          >
+        <button
+          type="button"
+          disabled={isSubmitting || isGoogleSubmitting}
+          onClick={handleGoogleSignIn}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded border border-border bg-card px-3 py-2 text-[11px] font-mono font-bold uppercase tracking-wider text-text-dim transition-all duration-200 hover:border-info hover:text-info hover:shadow-info-glow disabled:cursor-not-allowed disabled:opacity-50"
+        >
           <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
             <path
               fill="currentColor"
@@ -194,9 +190,8 @@ export default function SigninForm() {
               d="M7.38 1.5C8.68 1.06 10.08.83 11.5.83c1.41 0 2.78.31 4.05.93.06.03.13.06.19.09.31-.76.68-1.52 1.1-2.24C15.25 1.1 13.91.83 12.5.83c-1.52-.01-3.03.17-4.46.69z"
             />
           </svg>
-          [ CONTINUE WITH GOOGLE ]
+          {isGoogleSubmitting ? "[ CONNECTING... ]" : "[ CONTINUE WITH GOOGLE ]"}
         </button>
-      </form>
 
         {/* Dev Credentials Helper */}
         <div className="mt-6 rounded border border-border bg-card/40 px-3 py-2 text-[10px] font-mono text-text-dim">
