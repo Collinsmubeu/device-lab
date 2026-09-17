@@ -20,6 +20,12 @@ export const DEV_ADMIN = {
   password: "lab254-rock",
 };
 
+export const DEV_CREDENTIALS: Record<string, { password: string; role: UserRole }> = {
+  "owner@device254.dev": { password: "lab254-rock", role: "OWNER" },
+  "worker@device254.dev": { password: "work254-pass", role: "WORKER" },
+  "client@device254.dev": { password: "client254-pass", role: "CUSTOMER" },
+};
+
 function secret(): string {
   const s = process.env.SESSION_SECRET;
   if (s) return s;

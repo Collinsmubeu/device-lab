@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { db } from "@/lib/db";
-import { createSessionCookie, UserRole } from "@/lib/auth";
+import { createSessionCookie, UserRole, DEV_CREDENTIALS } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +13,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { message: "[ ACCESS_DENIED // MISSING_CREDENTIALS ]" },
         { status: 400 },
+      );
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const devCred = DEV_CREDENTIALS[normalizedEmail];
+    if (devCred && process.env.NODE_ENV !== "production") {
+      if (password === devCred.password) {
+        const role: UserRole = devCred.role;
+        const res = NextResponse.json(
+          {
+            message: "[ SESSION_INITIALIZED // ACCESS_GRANTED ]",
+            role,
+            email: normalizedEmail,
+          },
+          { status: 200 },
+        );
+        res.cookies.set(createSessionCookie(`dev-${role.toLowerCase()}`, normalizedEmail, role));
+        return res;
+      }
+      return NextResponse.json(
+        { message: "[ AUTHENTICATION_FAILED // INVALID_CREDENTIALS ]" },
+        { status: 401 },
       );
     }
 
