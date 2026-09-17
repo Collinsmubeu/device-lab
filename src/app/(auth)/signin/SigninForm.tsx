@@ -171,13 +171,11 @@ export default function SigninForm() {
         </div>
 
         {/* Google OAuth */}
-        <button
-          type="button"
-          onClick={() => {
-            window.location.href = "/api/auth/google";
-          }}
-          className="flex w-full items-center justify-center gap-2 rounded border border-border bg-card px-3 py-2 text-[11px] font-mono font-bold uppercase tracking-wider text-text-dim transition-all duration-200 hover:border-info hover:text-info hover:shadow-info-glow"
-        >
+        <form action="/api/auth/google" method="get">
+          <button
+            type="submit"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded border border-border bg-card px-3 py-2 text-[11px] font-mono font-bold uppercase tracking-wider text-text-dim transition-all duration-200 hover:border-info hover:text-info hover:shadow-info-glow"
+          >
           <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
             <path
               fill="currentColor"
@@ -198,6 +196,7 @@ export default function SigninForm() {
           </svg>
           [ CONTINUE WITH GOOGLE ]
         </button>
+      </form>
 
         {/* Dev Credentials Helper */}
         <div className="mt-6 rounded border border-border bg-card/40 px-3 py-2 text-[10px] font-mono text-text-dim">

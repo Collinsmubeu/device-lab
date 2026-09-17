@@ -8,7 +8,7 @@ export function Providers({ children, ...props }: ThemeProviderProps) {
     <ThemeProvider
       attribute="class"
       defaultTheme="obsidian"
-      themes={["obsidian", "matrix", "friendly"]}
+      themes={["obsidian", "matrix", "friendly", "cyberpunk", "synthwave", "retro"]}
       {...props}
     >
       {children}

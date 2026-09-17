@@ -99,6 +99,66 @@
   --text-dim2: #facc15;
 }
 
+/* Cyberpunk — deep purple with neon pink/cyan */
+.cyberpunk {
+  --background: #040114;
+  --background-soft: #0a0622;
+  --card: #0f0b2a;
+  --card-2: #1a1440;
+  --border: #2e255f;
+  --border-soft: #4a407a;
+  --accent: #ec4899;
+  --accent-dim: #be123c;
+  --danger: #f87171;
+  --warning: #fbbf24;
+  --info: #26a0f3;
+  --purple: #a855f7;
+  --pink: #ec4899;
+  --text: #f0eff5;
+  --text-dim: #a397c7;
+  --text-dim2: #7a6e9a;
+}
+
+/* Synthwave — electric blue on black with magenta */
+.synthwave {
+  --background: #000000;
+  --background-soft: #0a0014;
+  --card: #0a0014;
+  --card-2: #1a0024;
+  --border: #00001a;
+  --border-soft: #00002a;
+  --accent: #00f0ff;
+  --accent-dim: #0099aa;
+  --danger: #ff006e;
+  --warning: #ffbe0b;
+  --info: #00f0ff;
+  --purple: #7209b7;
+  --pink: #ff006e;
+  --text: #e6e6ff;
+  --text-dim: #9ca3af;
+  --text-dim2: #6b7280;
+}
+
+/* Retro — warm amber on dark brown */
+.retro {
+  --background: #1a120f;
+  --background-soft: #221912;
+  --card: #221912;
+  --card-2: #2a2016;
+  --border: #3a2e23;
+  --border-soft: #4a3e30;
+  --accent: #ff9e00;
+  --accent-dim: #cc8100;
+  --danger: #ff5252;
+  --warning: #ffd43b;
+  --info: #8338ec;
+  --purple: #8338ec;
+  --pink: #fb5e62;
+  --text: #f5f0e6;
+  --text-dim: #b8a893;
+  --text-dim2: #8a7a63;
+}
+
 html {
   color-scheme: dark;
 }

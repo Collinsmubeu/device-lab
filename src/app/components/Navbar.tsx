@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ThemeSwitcher } from "@/app/components/ThemeSwitcher";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -53,8 +54,14 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Right Zone: Auth + Live Status */}
+        {/* Right Zone: Auth + Theme + Live Status */}
         <div className="flex items-center gap-3">
+          <div className="hidden items-center gap-2 sm:flex">
+            <span className="text-[9px] uppercase tracking-wider text-text-dim">
+              THEME:
+            </span>
+            <ThemeSwitcher />
+          </div>
           <Link
             href="/signin?mode=register"
             className="rounded border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-dim transition-colors hover:border-neon hover:text-neon"

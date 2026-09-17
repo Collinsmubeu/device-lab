@@ -3,23 +3,24 @@
 import { useTheme } from "next-themes";
 
 const themes = [
-  { id: "obsidian", label: "[ ⚡_OBSIDIAN ]" },
-  { id: "matrix", label: "[ ◯_MATRIX ]" },
-  { id: "friendly", label: "[ 👁_FRIENDLY ]" },
+  { id: "obsidian", label: "[ ⚡_OBSIDIAN ]", activeClass: "border-neon bg-neon/10 text-neon" },
+  { id: "matrix", label: "[ ◯_MATRIX ]", activeClass: "border-info bg-info/10 text-info" },
+  { id: "friendly", label: "[ ☀_FRIENDLY ]", activeClass: "border-warning bg-warning/10 text-warning" },
+  { id: "cyberpunk", label: "[ 🌙_CYBERPUNK ]", activeClass: "border-pink bg-pink/10 text-pink" },
+  { id: "synthwave", label: "[ 🌊_SYNTHWAVE ]", activeClass: "border-info bg-info/10 text-info" },
+  { id: "retro", label: "[ 🔥_RETRO ]", activeClass: "border-warning bg-warning/10 text-warning" },
 ] as const;
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
 
-  // `theme` is undefined until next-themes hydrates on the client.
-  // Rendering a stable placeholder here prevents hydration mismatches.
   if (!theme) {
     return (
       <div className="flex items-center gap-2" aria-hidden="true">
         {themes.map((t) => (
           <button
             key={t.id}
-            className="px-3 py-1.5 text-[11px] uppercase tracking-wider border border-zinc-800 bg-zinc-900/50 rounded opacity-50 pointer-events-none"
+            className="rounded border border-border bg-card/60 px-3 py-1.5 text-[11px] uppercase tracking-wider text-text-dim opacity-50"
           >
             {t.label}
           </button>
@@ -29,21 +30,24 @@ export function ThemeSwitcher() {
   }
 
   return (
-    <div className="flex items-center gap-2" role="group" aria-label="Theme selector">
-      {themes.map((t) => (
-        <button
-          key={t.id}
-          onClick={() => setTheme(t.id)}
-          className={`px-3 py-1.5 text-[11px] uppercase tracking-wider border rounded transition-all duration-150 ${
-            theme === t.id
-              ? "border-accent bg-accent/10 text-accent shadow-[0_0_0_1px]_var(--accent)"
-              : "border-zinc-800 bg-zinc-900/50 text-text-dim hover:border-zinc-700 hover:text-text"
-          }`}
-          aria-pressed={theme === t.id}
-        >
-          {t.label}
-        </button>
-      ))}
+    <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Theme selector">
+      {themes.map((t) => {
+        const isActive = theme === t.id;
+        return (
+          <button
+            key={t.id}
+            onClick={() => setTheme(t.id)}
+            className={`rounded border border-border px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition-all duration-200 ${
+              isActive
+                ? `${t.activeClass} shadow-neon-glow`
+                : "bg-card/40 text-text-dim hover:border-info hover:text-info hover:shadow-info-glow"
+            }`}
+            aria-pressed={isActive}
+          >
+            {t.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
