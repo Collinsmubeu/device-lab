@@ -19,7 +19,7 @@ const handler = NextAuth({
         console.log("[AUTH] signIn callback:", {
           user: user.email,
           provider: account?.provider,
-          profile,
+          profile: profile ? { email: profile.email } : null,
         });
 
         if (account?.provider === "google" && profile?.email) {
@@ -40,14 +40,33 @@ const handler = NextAuth({
                 role: role as "OWNER" | "WORKER" | "CUSTOMER",
               },
             });
+            console.log("[AUTH] Created new user:", email, role);
           }
         }
 
         return true;
       } catch (error) {
-        console.error("DEBUG AUTH COLLAPSE:", error);
+        console.error("DEBUG AUTH COLLAPSE:", {
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          code: (error as { code?: string })?.code,
+        });
         return false;
       }
+    },
+    // Add jwt callback to store role
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = (user as { role?: string })?.role;
+      }
+      return token;
+    },
+    // Add session callback to expose role
+    async session({ session, token }) {
+      if (session.user && token) {
+        session.user.role = token.role as "OWNER" | "WORKER" | "CUSTOMER";
+      }
+      return session;
     },
   },
   pages: {
