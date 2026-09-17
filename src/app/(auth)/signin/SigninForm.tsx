@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 type Role = "OWNER" | "WORKER" | "CUSTOMER";
@@ -24,7 +23,6 @@ export default function SigninForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,21 +30,6 @@ export default function SigninForm() {
     setFeedback("[ SYS_VERIFYING // ACCESSING PORTAL_PERMISSIONS... ]");
 
     try {
-      const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl") || "/";
-      const res = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-        callbackUrl,
-      });
-
-      if (res?.error) {
-        setFeedback("[ AUTHENTICATION_FAILED // INVALID_CREDENTIALS ]");
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Determine role from email for dev accounts
       const lowerEmail = email.toLowerCase();
       let role: Role = "CUSTOMER";
       if (DEV_OWNER_EMAILS.includes(lowerEmail)) {
@@ -54,13 +37,18 @@ export default function SigninForm() {
       } else if (DEV_WORKER_EMAILS.includes(lowerEmail)) {
         role = "WORKER";
       }
-
       const route = ROLE_ROUTES[role];
-      setFeedback("[ SESSION_INITIALIZED // ACCESS_GRANTED ]");
 
-      setTimeout(() => {
-        router.push(route);
-      }, 600);
+      const result = await signIn("credentials", {
+        redirect: true,
+        email,
+        password,
+        callbackUrl: route,
+      });
+
+      if (result?.error) {
+        setFeedback("[ AUTHENTICATION_FAILED // INVALID_CREDENTIALS ]");
+      }
     } catch {
       setFeedback("[ ERROR // NETWORK_FAILURE ]");
     } finally {
