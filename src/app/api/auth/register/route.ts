@@ -1,50 +1,77 @@
-import { db } from "@/lib/db";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { Prisma, UserRole as PrismaUserRole } from "@prisma/client";
+
+const OWNER_EMAIL = "cmubeu@gmail.com";
+
+function resolveRole(email: string): PrismaUserRole {
+  return email.trim().toLowerCase() === OWNER_EMAIL
+    ? PrismaUserRole.OWNER
+    : PrismaUserRole.CUSTOMER;
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, role } = body;
+    const { email, password }: { email: string; password: string } = body;
 
-    if (!email || !password || !role) {
+    if (!email || !password) {
       return NextResponse.json(
         { message: "[ ACCESS_DENIED // MISSING_CREDENTIALS ]" },
-        { status: 400 }
+        { status: 400 },
+      );
+    }
+
+    if (typeof email !== "string" || typeof password !== "string") {
+      return NextResponse.json(
+        { message: "[ ACCESS_DENIED // INVALID_PAYLOAD ]" },
+        { status: 400 },
       );
     }
 
     const existingUser = await db.user.findUnique({
-      where: { email },
+      where: { email: email.trim().toLowerCase() },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { message: "[ ACCESS DENIED // EMAIL ALREADY REGISTERED ]" },
-        { status: 400 }
+        { message: "[ ACCESS DENIED // IDENTITY ARCHIVE CONFLICT ]" },
+        { status: 400 },
       );
     }
 
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
+    const role = resolveRole(email);
 
     const user = await db.user.create({
       data: {
-        email,
+        email: email.trim().toLowerCase(),
         passwordHash,
         role,
       },
     });
 
     return NextResponse.json(
-      { message: "[ ACCOUNT_CREATION_SUCCESSFUL // ROLE_ASSIGNED ]", user },
-      { status: 201 }
+      {
+        message: "[ ONBOARDING_SUCCESSFUL // ROLE_LOCKED_IN ]",
+        user: { email: user.email, role: user.role },
+      },
+      { status: 201 },
     );
   } catch (error) {
-    console.error("Registration error:", error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json(
+        { message: "[ REGISTRATION_FAILED // IDENTITY_CONFLICT ]" },
+        { status: 409 },
+      );
+    }
+    console.error("[ SYS_AUTH // REGISTRATION_ERROR ]:", error);
     return NextResponse.json(
       { message: "[ REGISTRATION_FAILED // SERVER_ERROR ]" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -5,7 +5,7 @@ import { verifySession } from "@/lib/auth";
 
 export async function POST(request: Request) {
   const session = await verifySession();
-  if (!session || session.role !== "admin") {
+  if (!session || session.role !== "OWNER") {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 403 },

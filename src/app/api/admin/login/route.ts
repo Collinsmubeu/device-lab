@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
   const email = (form.get("email")?.toString() ?? "").trim();
   const password = form.get("password")?.toString() ?? "";
 
-  // Constant-time-ish comparison to resist trivial timing leaks on the demo creds.
   const okEmail = email === DEV_ADMIN.email;
   const okPass = password === DEV_ADMIN.password;
   if (!okEmail || !okPass) {
@@ -17,9 +16,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const role = email === DEV_ADMIN.email ? "admin" : "staff";
-  const res = NextResponse.redirect(new URL("/admin", request.url));
-  res.cookies.set(createSessionCookie(email, role));
+  const role = email === DEV_ADMIN.email ? "OWNER" : "WORKER";
+  const res = NextResponse.redirect(new URL("/admin/dashboard", request.url));
+  res.cookies.set(createSessionCookie(email, email, role));
   return res;
 }
 

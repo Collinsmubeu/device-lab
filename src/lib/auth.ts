@@ -2,9 +2,12 @@ import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 
+export type UserRole = "OWNER" | "WORKER" | "CUSTOMER";
+
 export interface SessionPayload {
   userId: string;
-  role: "admin" | "staff";
+  email: string;
+  role: UserRole;
   exp: number; // epoch seconds
 }
 
@@ -21,24 +24,19 @@ function secret(): string {
   const s = process.env.SESSION_SECRET;
   if (s) return s;
   if (process.env.NODE_ENV !== "production") {
-    // Fail-open only in local dev so the secure route is demonstrable.
     return "dev-insecure-secret-replace-in-prod";
   }
-  // Fail CLOSED in production when the secret is missing.
   throw new Error("SESSION_SECRET is not configured.");
 }
 
 function b64url(input: string): string {
   return Buffer.from(input, "utf8").toString("base64url");
 }
+
 function unb64url(input: string): string {
   return Buffer.from(input, "base64url").toString("utf8");
 }
 
-/**
- * Signs a payload into a tamper-proof, opaque token:
- *   base64url(payload).base64url(HMAC-SHA256(payload))
- */
 export function sign(payload: SessionPayload): string {
   const body = b64url(JSON.stringify(payload));
   const sig = createHmac("sha256", secret()).update(body).digest("base64url");
@@ -50,7 +48,6 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
 
-/** Verifies signature + expiry. Returns null on any failure (fail closed). */
 export function verify(token: string | undefined): SessionPayload | null {
   if (!token) return null;
   const dot = token.lastIndexOf(".");
@@ -63,6 +60,7 @@ export function verify(token: string | undefined): SessionPayload | null {
     const payload = JSON.parse(unb64url(body)) as SessionPayload;
     if (
       typeof payload.userId !== "string" ||
+      typeof payload.email !== "string" ||
       typeof payload.role !== "string" ||
       typeof payload.exp !== "number"
     ) {
@@ -75,22 +73,21 @@ export function verify(token: string | undefined): SessionPayload | null {
   }
 }
 
-/** Reads the session cookie from the current server request context. */
 export async function verifySession(): Promise<SessionPayload | null> {
   const store = await cookies();
   return verify(store.get(SESSION_COOKIE)?.value);
 }
 
-/** Reads the session cookie straight off a Route Handler request. */
 export function getSessionFromRequest(
   token: string | undefined,
 ): SessionPayload | null {
   return verify(token);
 }
 
-export function createSessionCookie(userId: string, role: "admin" | "staff") {
+export function createSessionCookie(userId: string, email: string, role: UserRole) {
   const payload: SessionPayload = {
     userId,
+    email,
     role,
     exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
   };

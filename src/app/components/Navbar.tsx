@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function Navbar() {
@@ -20,8 +20,8 @@ export default function Navbar() {
           : "border-transparent bg-canvas"
       }`}
     >
-      <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-4 sm:px-6">
-        {/* ── Left Zone: Logo & Subtitle ── */}
+      <div className="mx-auto flex h-12 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+        {/* Left Zone: Logo & Subtitle */}
         <div className="flex flex-col">
           <span className="text-xs tracking-[0.3em] text-text">
             D V C L B // 254
@@ -31,8 +31,8 @@ export default function Navbar() {
           </span>
         </div>
 
-        {/* ── Center Zone: Nav Links ── */}
-        <div className="flex items-center gap-6">
+        {/* Center Zone: Nav Links */}
+        <div className="hidden items-center gap-6 md:flex">
           <Link
             href="#marketplace"
             className="text-text-dim transition-colors hover:text-neon"
@@ -40,10 +40,10 @@ export default function Navbar() {
             [ 01_MARKETPLACE ]
           </Link>
           <Link
-            href="#cash-out"
+            href="/trade-in"
             className="text-text-dim transition-colors hover:text-neon"
           >
-            [ 02_CASH_OUT ]
+            [ 02_TRADE_IN ]
           </Link>
           <Link
             href="#services"
@@ -53,13 +53,27 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* ── Right Zone: Live Status Badge ── */}
-        <div className="flex items-center gap-2">
+        {/* Right Zone: Auth + Live Status */}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/signin?mode=register"
+            className="rounded border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-dim transition-colors hover:border-neon hover:text-neon"
+          >
+            [ SECURE_ACCOUNT // SIGN_UP ]
+          </Link>
+          <Link
+            href="/signin"
+            className="rounded border border-neon bg-neon/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neon transition-colors hover:bg-neon/20"
+          >
+            [ AUTHENTICATE // LOGIN ]
+          </Link>
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon opacity-75"></span>
             <span className="relative inline-flex h-2 w-2 rounded-full bg-neon"></span>
           </span>
-          <span className="text-xs text-text-dim">LIVE_INTAKE_OPEN</span>
+          <span className="hidden text-xs text-text-dim lg:inline">
+            LIVE_INTAKE_OPEN
+          </span>
         </div>
       </div>
     </nav>

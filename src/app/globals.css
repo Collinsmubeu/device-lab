@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Device Lab 254 — Obsidian Dark-Mode Streetwear palette */
   --color-canvas: #09090b;
   --color-canvas-soft: #0f0f13;
   --color-card: #141417;
@@ -20,13 +19,65 @@
   --font-mono: var(--font-geist-mono);
 }
 
+:root {
+  --background: #09090b;
+  --card: #141417;
+  --border: #27272a;
+  --accent: #22c55e;
+  --text: #ffffff;
+  --text-dim: #9ca3af;
+  --text-dim2: #777782;
+  --neon-dim: #1a8e3a;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+.obsidian {
+  --background: #09090b;
+  --card: #141417;
+  --border: #27272a;
+  --accent: #22c55e;
+  --text: #ffffff;
+  --text-dim: #9ca3af;
+  --text-dim2: #777782;
+  --neon-dim: #1a8e3a;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+.matrix {
+  --background: #ffffff;
+  --card: #f4f4f5;
+  --border: #000000;
+  --accent: #000000;
+  --text: #09090b;
+  --text-dim: #3f3f46;
+  --text-dim2: #52525b;
+  --neon-dim: #000000;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+.friendly {
+  --background: #000000;
+  --card: #121212;
+  --border: #facc15;
+  --accent: #eab308;
+  --text: #ffffff;
+  --text-dim: #fde047;
+  --text-dim2: #facc15;
+  --neon-dim: #ca8a04;
+  --danger: #f87171;
+  --warning: #fde047;
+}
+
 html {
   color-scheme: dark;
 }
 
 body {
-  background: var(--color-canvas);
-  color: var(--color-text);
+  background: var(--background);
+  color: var(--text);
   font-family: var(--font-mono);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -34,24 +85,59 @@ body {
 }
 
 @layer base {
-  /* Strict monospace — no serif fallback leakage across the storefront. */
   html {
     font-feature-settings: "liga" 1, "calt" 1;
   }
 }
 
-/* Terminal-style monochrome scrollbars — industrial, not distracting. */
+.friendly {
+  line-height: 1.75;
+}
+
+.friendly p,
+.friendly li,
+.friendly span,
+.friendly div {
+  font-weight: 700;
+}
+
+.friendly a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-card);
+  background: var(--card);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: var(--border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-neon);
+  background: var(--accent);
+}
+
+@layer utilities {
+  .hover-bg-neon\/20:hover {
+    background-color: color-mix(in oklab, var(--color-neon) 20%, transparent);
+  }
+  .hover-bg-danger\/20:hover {
+    background-color: color-mix(in oklab, var(--color-danger) 20%, transparent);
+  }
+  .hover-bg-warning\/20:hover {
+    background-color: color-mix(in oklab, var(--color-warning) 20%, transparent);
+  }
+  .shadow-neon-glow {
+    box-shadow: 0 0 10px var(--color-neon), 0 0 20px var(--color-neon);
+  }
+  .shadow-danger-glow {
+    box-shadow: 0 0 10px var(--color-danger), 0 0 20px var(--color-danger);
+  }
+  .shadow-warning-glow {
+    box-shadow: 0 0 10px var(--color-warning), 0 0 20px var(--color-warning);
+  }
 }

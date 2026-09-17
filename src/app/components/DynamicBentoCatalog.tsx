@@ -202,10 +202,10 @@ export default function DynamicBentoCatalog({ initialLaptops }: BentoCatalogProp
               {(isSold || !isAvailable) && (
                 <div
                   aria-label="archived / sold out"
-                  className="pointer-events-none absolute inset-0 rounded-xl"
+                  className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl"
                 >
                   <span className="absolute inset-0 -z-10 block h-full w-full rounded-xl bg-[repeating-linear-gradient(45deg,theme(colors.border)_0,theme(colors.border)_2px,theme(colors.text-dim)_2px,theme(colors.text-dim)_4px)] opacity-15" />
-                  <span className="absolute inset-0 m-auto -translate-y-1/2 rounded-md border border-danger bg-card/80 px-3 py-1 text-xs font-bold uppercase tracking-wider text-danger">
+                  <span className="relative rounded-md border border-danger bg-card/80 px-3 py-1 text-xs font-bold uppercase tracking-wider text-danger">
                     [ ARCHIVED / SOLD OUT ]
                   </span>
                 </div>

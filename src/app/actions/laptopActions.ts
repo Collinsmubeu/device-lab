@@ -10,13 +10,10 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { LaptopStatus, TransactionStatus, TransactionType, UserRole } from "@prisma/client";
+import { LaptopStatus, TransactionStatus, TransactionType } from "@prisma/client";
 import type { AuditLog, Laptop, Transaction } from "@prisma/client";
 import { verifySession } from "@/lib/auth";
 import { PAYOUT_OVERRIDE_FLOOR_KSH } from "@/lib/config";
-
-export type { Laptop, AuditLog, Transaction };
-export { LaptopStatus, TransactionStatus, TransactionType, UserRole };
 
 export interface SystemMetrics {
   totalRevenueKsh: number;
@@ -118,7 +115,7 @@ export async function toggleRemoteApproval(
 ): Promise<ApprovalResult> {
   const session = await verifySession();
 
-  if (!session || session.role !== "admin") {
+  if (!session || session.role !== "OWNER") {
     return {
       success: false,
       message: "[ ACCESS_DENIED // NOT_AUTHORIZED ]",

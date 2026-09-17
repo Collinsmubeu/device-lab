@@ -8,7 +8,7 @@
  * and nothing above this module breaks.
  */
 
-export type StaffRole = "admin" | "manager" | "tech";
+export type StaffRole = "OWNER" | "WORKER" | "CUSTOMER";
 
 export interface Staff {
   id: string;
@@ -40,7 +40,7 @@ export interface PendingPayout {
   amountKsh: number;
   reason: string;
   requestedAt: string; // "[HH:MM]"
-  role: Exclude<StaffRole, "admin">;
+  role: Exclude<StaffRole, "OWNER">;
 }
 
 export interface DashboardData {
@@ -50,10 +50,10 @@ export interface DashboardData {
 }
 
 const STAFF: Staff[] = [
-  { id: "Staff_Kamau", name: "Kamau", role: "tech" },
-  { id: "Staff_Amina", name: "Amina", role: "manager" },
-  { id: "Staff_Brian", name: "Brian", role: "tech" },
-  { id: "Staff_Mary", name: "Mary", role: "manager" },
+  { id: "Staff_Kamau", name: "Kamau", role: "WORKER" },
+  { id: "Staff_Amina", name: "Amina", role: "WORKER" },
+  { id: "Staff_Brian", name: "Brian", role: "WORKER" },
+  { id: "Staff_Mary", name: "Mary", role: "WORKER" },
 ];
 
 const store: {
@@ -122,7 +122,7 @@ const store: {
       amountKsh: 45000,
       reason: "Manager override — customer pickup, no card terminal",
       requestedAt: "[10:48]",
-      role: "manager",
+      role: "WORKER",
     },
     {
       id: "p2",
@@ -132,7 +132,7 @@ const store: {
       amountKsh: 38000,
       reason: "Walk-in buyer, insists on cash settlement",
       requestedAt: "[13:12]",
-      role: "manager",
+      role: "WORKER",
     },
   ],
   seq: 1000,

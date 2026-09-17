@@ -16,8 +16,8 @@ export const fetchCache = "force-no-store";
 
 export default async function AdminPage() {
   const session = await verifySession();
-  if (!session || session.role !== "admin") {
-    redirect("/admin/login");
+  if (!session || session.role !== "OWNER") {
+    redirect("/signin");
   }
 
   return <LiveDashboard />;
