@@ -7,20 +7,17 @@ import { useTheme } from "next-themes";
 import {
   Home,
   LayoutGrid,
-  Bell,
-  Settings,
-  Shield,
-  FileText,
-  BarChart3,
-  DollarSign,
-  Users,
-  Workflow,
   Zap,
   Key,
   LifeBuoy,
+  Workflow,
+  BarChart3,
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Shield,
+  FileText,
+  DollarSign,
 } from "lucide-react";
 
 export type UserRole = "owner" | "worker" | "client";
@@ -40,27 +37,25 @@ export interface SidebarGroup {
 
 const COMMON_ITEMS: SidebarItem[] = [
   { label: "Dashboard Homepage", href: "/", icon: Home, roles: ["owner", "worker", "client"] },
-  { label: "Prompt Marketplace Grid", href: "/marketplace", icon: LayoutGrid, roles: ["owner", "worker", "client"] },
-  { label: "Notification Station", href: "/notifications", icon: Bell, roles: ["owner", "worker", "client"] },
-  { label: "Profile & Settings", href: "/settings", icon: Settings, roles: ["owner", "worker", "client"] },
+  { label: "Marketplace", href: "/#marketplace", icon: LayoutGrid, roles: ["owner", "worker", "client"] },
+  { label: "Trade-In Terminal", href: "/trade-in", icon: Zap, roles: ["owner", "worker", "client"] },
 ];
 
 const OWNER_ITEMS: SidebarItem[] = [
-  { label: "Remote Owner Control Panel", href: "/admin/control", icon: Shield, roles: ["owner"] },
-  { label: "Live Audit Log Hub", href: "/admin/audit", icon: FileText, roles: ["owner"] },
-  { label: "Marketplace Financial Engine", href: "/admin/finance", icon: DollarSign, roles: ["owner"] },
-  { label: "Role Assignment Console", href: "/admin/roles", icon: Users, roles: ["owner"] },
+  { label: "Owner Dashboard", href: "/admin/dashboard", icon: Shield, roles: ["owner"] },
+  { label: "Audit Log", href: "/admin/dashboard#audit", icon: FileText, roles: ["owner"] },
+  { label: "Payout Approvals", href: "/admin/dashboard#payouts", icon: DollarSign, roles: ["owner"] },
 ];
 
 const WORKER_ITEMS: SidebarItem[] = [
-  { label: "Active Task Portal", href: "/worker/tasks", icon: Workflow, roles: ["worker"] },
-  { label: "Prompt Benchmarking", href: "/worker/benchmark", icon: BarChart3, roles: ["worker"] },
+  { label: "Worker Dashboard", href: "/staff/dashboard", icon: Workflow, roles: ["worker"] },
+  { label: "Diagnostic Grading", href: "/staff/dashboard#diagnostic", icon: BarChart3, roles: ["worker"] },
 ];
 
 const CLIENT_ITEMS: SidebarItem[] = [
-  { label: "Instant Quote Engine", href: "/client/quote", icon: Zap, roles: ["client"] },
-  { label: "Bought Prompt Vault", href: "/client/vault", icon: Key, roles: ["client"] },
-  { label: "Customer Support Center", href: "/client/support", icon: LifeBuoy, roles: ["client"] },
+  { label: "Customer Vault", href: "/customer/dashboard", icon: Key, roles: ["client"] },
+  { label: "Trade-In Offers", href: "/customer/dashboard#offers", icon: Zap, roles: ["client"] },
+  { label: "Service Tickets", href: "/customer/dashboard#tickets", icon: LifeBuoy, roles: ["client"] },
 ];
 
 const KILO_TOOLS: SidebarItem[] = [];

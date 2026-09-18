@@ -209,28 +209,25 @@ export default function Home() {
   }
 
   return (
-    <div className="animate-in fade-in duration-500">
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <HeroSection />
+    <div className="animate-in fade-in duration-500 space-y-16">
+      <HeroSection />
 
-        <section
-          id="marketplace"
-          aria-labelledby="marketplace-heading"
-          className="mt-16"
+      <section
+        id="marketplace"
+        aria-labelledby="marketplace-heading"
+      >
+        <h2
+          id="marketplace-heading"
+          className="mb-6 text-xs font-medium uppercase tracking-wider text-info"
         >
-          <h2
-            id="marketplace-heading"
-            className="mb-6 text-xs font-medium uppercase tracking-wider text-info"
-          >
-            Current Drops
-          </h2>
-          <LaptopCatalog />
-        </section>
+          Current Drops
+        </h2>
+        <LaptopCatalog />
+      </section>
 
       <section
         id="cash-out"
         aria-labelledby="cash-out-heading"
-        className="mt-16"
       >
         <h2
           id="cash-out-heading"
@@ -249,7 +246,6 @@ export default function Home() {
           [ OPEN_TRADE_IN_TERMINAL ]
         </a>
       </section>
-      </main>
     </div>
   );
 }

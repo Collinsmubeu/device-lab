@@ -26,10 +26,12 @@ export default function LayoutContent({ children }: { children: ReactNode }) {
             <Sidebar />
           </aside>
         )}
-        <main className={`flex-1 overflow-y-auto ${isAuthenticated ? "" : "mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"}`}>
-          <div className="p-6">
-            {children}
-          </div>
+        <main className={`flex-1 overflow-y-auto ${isAuthenticated ? "p-6" : ""}`}>
+          {isAuthenticated ? (
+            <div className="p-6">{children}</div>
+          ) : (
+            children
+          )}
         </main>
       </div>
       <Footer />
