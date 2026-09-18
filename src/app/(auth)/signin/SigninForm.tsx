@@ -20,15 +20,41 @@ export default function SigninForm() {
     setFeedback("[ SYS_VERIFYING // ACCESSING PORTAL_PERMISSIONS... ]");
 
     try {
-      const result = await signIn("credentials", {
-        redirect: true,
-        email,
-        password,
-        callbackUrl: "/api/auth/callback/role-redirect",
-      });
+      if (mode === "register") {
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
 
-      if (result?.error) {
-        setFeedback("[ AUTHENTICATION_FAILED // INVALID_CREDENTIALS ]");
+        const data = await res.json();
+
+        if (!res.ok) {
+          setFeedback(`[ REGISTRATION_FAILED // ${data.message || "ERROR"} ]`);
+        } else {
+          setFeedback("[ ONBOARDING_SUCCESSFUL // SIGNING IN... ]");
+          const result = await signIn("credentials", {
+            redirect: true,
+            email,
+            password,
+            callbackUrl: "/api/auth/callback/role-redirect",
+          });
+
+          if (result?.error) {
+            setFeedback("[ AUTHENTICATION_FAILED // INVALID_CREDENTIALS ]");
+          }
+        }
+      } else {
+        const result = await signIn("credentials", {
+          redirect: true,
+          email,
+          password,
+          callbackUrl: "/api/auth/callback/role-redirect",
+        });
+
+        if (result?.error) {
+          setFeedback("[ AUTHENTICATION_FAILED // INVALID_CREDENTIALS ]");
+        }
       }
     } catch {
       setFeedback("[ ERROR // NETWORK_FAILURE ]");
