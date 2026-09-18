@@ -39,7 +39,6 @@ export default function AdminLoginPage() {
                 id="email"
                 name="email"
                 type="email"
-                defaultValue="owner@device254.dev"
                 required
                 className="w-full rounded border border-border bg-card/80 px-3 py-2 text-sm text-text placeholder:text-text-dim focus:border-neon outline-none"
                 placeholder="owner@device254.dev"
@@ -56,10 +55,9 @@ export default function AdminLoginPage() {
                 id="password"
                 name="password"
                 type="password"
-                defaultValue="lab254-rock"
                 required
                 className="w-full rounded border border-border bg-card/80 px-3 py-2 text-sm text-text placeholder:text-text-dim focus:border-neon outline-none"
-                placeholder="••••••••"
+                placeholder="enter passcode"
               />
             </div>
           </div>
@@ -73,7 +71,7 @@ export default function AdminLoginPage() {
         </form>
 
         <p className="mt-6 text-center text-[10px] text-text-dim">
-          demo credentials auto-filled. production swaps this for SSO + MFA.
+          credentials verified against the database.
         </p>
       </div>
     </main>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Logo from "@/app/components/Logo";
 import { useSession } from "next-auth/react";
 import { ChevronDown, User } from "lucide-react";
 
@@ -23,20 +24,7 @@ export default function Navbar() {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-4">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon opacity-75"></span>
-                <span className="relative inline-flex h-3 w-3 rounded-full border border-neon bg-neon shadow-neon-glow"></span>
-              </span>
-              <span className="text-xl font-black tracking-[0.4em] text-neon">
-                D V C L B 254
-              </span>
-            </div>
-            <span className="text-[9px] text-text-dim">
-              Nairobi_HQ // Hardware_Archive
-            </span>
-          </div>
+          <Logo size="md" showPulse />
         </div>
 
         <div className="hidden items-center gap-6 md:flex">

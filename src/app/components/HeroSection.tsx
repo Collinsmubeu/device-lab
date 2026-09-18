@@ -1,13 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-provider";
+import Logo from "@/app/components/Logo";
 
 export default function HeroSection() {
+  const { status } = useAuth();
+  const isAuthenticated = status === "authenticated";
+
   return (
     <section className="relative flex min-h-[70vh] w-full items-center justify-center overflow-hidden font-mono">
       <div className="absolute inset-0 bg-gradient-hero" />
 
-      {/* Technical geometric grid background */}
       <div
         className="absolute inset-0"
         style={{
@@ -20,7 +24,6 @@ export default function HeroSection() {
         }}
       />
 
-      {/* Radial beams of light */}
       <div
         className="absolute inset-0"
         style={{
@@ -30,7 +33,6 @@ export default function HeroSection() {
         aria-hidden="true"
       />
 
-      {/* Radial mask fading toward edges */}
       <div
         className="absolute inset-0"
         style={{
@@ -41,7 +43,9 @@ export default function HeroSection() {
       />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
-        {/* Giant header with gradient text */}
+        <div className="mb-6 flex justify-center">
+          <Logo size="xl" showPulse />
+        </div>
         <h1 className="bg-gradient-to-b from-text via-text/80 to-text-dim bg-clip-text text-5xl font-extrabold tracking-tighter text-transparent sm:text-6xl md:text-7xl">
           <span className="block">GEAR FOR THE</span>
           <span className="block text-neon">MAIN_CHARACTER.</span>
@@ -53,7 +57,6 @@ export default function HeroSection() {
           that ship ready to perform.
         </p>
 
-        {/* Interactive targets */}
         <div className="mt-10 flex items-center justify-center gap-5">
           <Link
             href="#marketplace"
@@ -61,12 +64,21 @@ export default function HeroSection() {
           >
             [ SECURE THE SETUP ]
           </Link>
-          <Link
-            href="#cash-out"
-            className="rounded border border-purple px-5 py-2.5 text-xs font-bold text-purple uppercase tracking-wider transition-all duration-200 hover:bg-purple/10 hover:text-purple hover:shadow-purple-glow"
-          >
-            [ OFFLOAD USED GEAR ]
-          </Link>
+          {isAuthenticated ? (
+            <Link
+              href="/trade-in"
+              className="rounded border border-purple px-5 py-2.5 text-xs font-bold text-purple uppercase tracking-wider transition-all duration-200 hover:bg-purple/10 hover:text-purple hover:shadow-purple-glow"
+            >
+              [ OFFLOAD USED GEAR ]
+            </Link>
+          ) : (
+            <Link
+              href="/signin?callbackUrl=/trade-in"
+              className="rounded border border-purple px-5 py-2.5 text-xs font-bold text-purple uppercase tracking-wider transition-all duration-200 hover:bg-purple/10 hover:text-purple hover:shadow-purple-glow"
+            >
+              [ SIGN_IN_TO_TRADE_IN ]
+            </Link>
+          )}
         </div>
       </div>
     </section>

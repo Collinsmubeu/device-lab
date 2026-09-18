@@ -114,7 +114,7 @@ export default function SigninForm() {
               onChange={(e) => setEmail(e.target.value)}
               disabled={isSubmitting || isGoogleSubmitting}
               className="mt-1 w-full rounded border-2 border-border bg-card px-3 py-2 text-sm text-text font-mono placeholder:text-text-dim focus:border-neon focus:outline-none"
-              placeholder="owner@device254.dev"
+              placeholder="you@example.com"
               required
             />
           </div>

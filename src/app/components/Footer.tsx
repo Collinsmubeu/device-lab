@@ -21,7 +21,7 @@ export default function Footer() {
               </span>
             </div>
             <span className="text-xs text-text-dim">
-              {"// COORD: 1.2921° S, 36.8219° E"}
+              {"// COORD: 1.2921\u00b0 S, 36.8219\u00b0 E"}
             </span>
             <span className="text-[10px] text-text-dim/60">
               {"// SID: "}
@@ -32,11 +32,11 @@ export default function Footer() {
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-text-dim opacity-70 transition-opacity hover:opacity-100">
             <Link href="/trade-in" className="hover:text-info">Trade-In Flow</Link>
             <span className="text-text-dim/30">|</span>
-            <Link href="/inventory" className="hover:text-info">Browse Inventory</Link>
+            <Link href="/#marketplace" className="hover:text-info">Browse Inventory</Link>
             <span className="text-text-dim/30">|</span>
-            <Link href="/benchmarks" className="hover:text-info">Refurbish Benchmarks</Link>
+            <Link href="/trade-in" className="hover:text-info">Refurbish Benchmarks</Link>
             <span className="text-text-dim/30">|</span>
-            <Link href="/support" className="hover:text-info">Support Terminal</Link>
+            <a href="#marketplace" className="hover:text-info">Support Terminal</a>
           </div>
 
           <div className="flex flex-col items-center gap-1 sm:items-end">
@@ -47,7 +47,7 @@ export default function Footer() {
               {"[ ADMINISTRATIVE_PORTAL ]"}
             </Link>
             <span className="text-[10px] text-text-dim/50">
-              {"© 2026 DEVICE LAB 254. ALL RIGHTS RESERVED."}
+              {"\u00a9 2026 DEVICE LAB 254. ALL RIGHTS RESERVED."}
             </span>
           </div>
         </div>

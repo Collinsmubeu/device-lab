@@ -136,8 +136,8 @@ function DeviceSilhouette({ brand }: { brand: string }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <rect x="20" y="40" width="200" height="80" rx="10" />
-        <rect x="32" y="52" width="176" height="40" rx="6" className="fill-card-2" />
+        <rect x="20" y="40" width="200" height="80" rx="10" className="stroke-border" strokeWidth="2" />
+        <rect x="32" y="52" width="176" height="40" rx="6" className="fill-card-2 stroke-border" strokeWidth="1.5" />
         <circle cx="150" cy="108" r="3" className="fill-text-dim" />
         <circle cx="162" cy="108" r="3" className="fill-text-dim" />
       </svg>
@@ -153,20 +153,20 @@ export default function BentoCatalog() {
   const [focused, setFocused] = useState<string>(LAPTOPS[0].id);
 
   return (
-    <div
-      className="grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-4"
-      aria-label="Premium laptop stock"
-    >
-      {LAPTOPS.map((lap, i) => (
-        <article
-          key={lap.id}
-          onMouseEnter={() => setFocused(lap.id)}
-          className={`group relative min-h-[460px] h-full w-full cursor-pointer rounded-xl border border-border bg-gradient-card p-4 transition-all duration-300 ease-out font-mono shadow-inner ${
-            lap.inStock
-              ? "hover:border-emerald-500 hover:shadow-[0_0_22px_theme(colors.neon)] focus-within:border-emerald-500 focus-within:shadow-[0_0_22px_theme(colors.neon)]"
-              : "hover:border-red-600 hover:bg-red-950/5 focus-within:border-red-600 focus-within:bg-red-950/5"
-          } ${i === 0 ? "sm:col-span-2" : ""} ${i === 1 ? "lg:col-span-2" : ""}`}
+<div
+          className="grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-4"
+          aria-label="Premium laptop stock"
         >
+          {LAPTOPS.map((lap, i) => (
+            <article
+              key={lap.id}
+              onMouseEnter={() => setFocused(lap.id)}
+              className={`group relative min-h-[460px] h-full w-full cursor-pointer rounded-xl border border-border bg-gradient-card p-4 transition-all duration-300 ease-out font-mono shadow-inner ${
+                lap.inStock
+                  ? "hover:border-neon hover:shadow-[0_0_22px_theme(colors.neon)] focus-within:border-neon focus-within:shadow-[0_0_22px_theme(colors.neon)]"
+                  : "hover:border-danger hover:bg-danger/5 focus-within:border-danger focus-within:bg-danger/5"
+              } ${i === 0 ? "sm:col-span-2" : ""} ${i === 1 ? "lg:col-span-2" : ""}`}
+            >
           {/* Top Wrapper: metadata badges, brand, model, description */}
           <div className="flex flex-col">
             <DeviceSilhouette brand={lap.brand} />
@@ -216,11 +216,11 @@ export default function BentoCatalog() {
                 className={`rounded border border-border bg-card px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                   focused === lap.id
                     ? lap.inStock
-                      ? "border-emerald-500 text-emerald-500"
-                      : "border-red-600 text-red-600"
+                      ? "border-neon text-neon"
+                      : "border-danger text-danger"
                     : lap.inStock
-                      ? "hover:border-emerald-500 hover:text-emerald-500"
-                      : "hover:border-red-600 hover:text-red-600"
+                      ? "hover:border-neon hover:text-neon"
+                      : "hover:border-danger hover:text-danger"
                 }`}
               >
                 {lap.inStock ? "[ SECURE THE SETUP ]" : "[ ARCHIVED / SOLD OUT ]"}

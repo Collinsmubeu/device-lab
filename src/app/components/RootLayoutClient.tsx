@@ -25,13 +25,18 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
     );
   }
 
-  if (isPublicRoute && status === "unauthenticated") {
-    return <AuthLayout>{children}</AuthLayout>;
-  }
-
+  // Authenticated users ALWAYS get the dashboard shell (sidebar + navbar + footer)
+  // regardless of which route they visit.
   if (status === "authenticated") {
     return <DashboardLayout>{children}</DashboardLayout>;
   }
 
+  // Unauthenticated users on public routes get the auth layout (navbar + footer, no sidebar)
+  if (isPublicRoute) {
+    return <AuthLayout>{children}</AuthLayout>;
+  }
+
+  // Unauthenticated users on non-public routes fall through to AuthLayout
+  // (middleware will redirect to /signin for protected routes)
   return <AuthLayout>{children}</AuthLayout>;
 }

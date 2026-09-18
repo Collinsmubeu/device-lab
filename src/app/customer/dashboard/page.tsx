@@ -11,7 +11,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { db } from "@/lib/db";
-import { LaptopStatus, TransactionStatus } from "@prisma/client";
+import { LaptopStatus, TransactionStatus, TransactionType } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -35,7 +35,7 @@ async function getCustomerData() {
     }),
     db.transaction.findMany({
       where: {
-        type: "CASH_OUT_TRADEIN",
+        type: TransactionType.CASH_OUT_TRADEIN,
         status: TransactionStatus.PENDING,
       },
       orderBy: { createdAt: "desc" },
@@ -45,8 +45,8 @@ async function getCustomerData() {
       where: {
         status: TransactionStatus.PENDING,
         OR: [
-          { type: "CASH_IN_SALE" },
-          { type: "CASH_OUT_TRADEIN" },
+          { type: TransactionType.CASH_IN_SALE },
+          { type: TransactionType.CASH_OUT_TRADEIN },
         ],
       },
       orderBy: { createdAt: "desc" },

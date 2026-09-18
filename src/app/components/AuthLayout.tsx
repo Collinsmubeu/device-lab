@@ -19,10 +19,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  if (status === "authenticated") {
-    return null;
-  }
-
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-border">

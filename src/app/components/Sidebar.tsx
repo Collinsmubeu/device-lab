@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
+import Logo from "@/app/components/Logo";
 import {
   Home,
   LayoutGrid,
@@ -58,9 +59,7 @@ const CLIENT_ITEMS: SidebarItem[] = [
   { label: "Service Tickets", href: "/customer/dashboard#tickets", icon: LifeBuoy, roles: ["client"] },
 ];
 
-const KILO_TOOLS: SidebarItem[] = [];
-
-const ALL_THEMES = ["obsidian", "matrix", "circuit", "rust", "friendly", "cyberpunk", "synthwave", "retro"] as const;
+const ALL_THEMES = ["obsidian", "matrix", "friendly", "cyberpunk", "synthwave", "retro"] as const;
 
 function buildGroups(role: UserRole): SidebarGroup[] {
   const groups: SidebarGroup[] = [
@@ -73,10 +72,6 @@ function buildGroups(role: UserRole): SidebarGroup[] {
     groups.push({ title: "WORKER PORTAL", items: WORKER_ITEMS, roles: ["worker"] });
   } else {
     groups.push({ title: "CLIENT PORTAL", items: CLIENT_ITEMS, roles: ["client"] });
-  }
-
-  if (KILO_TOOLS.length > 0) {
-    groups.push({ title: "KILO AUTOMATION TOOLS", items: KILO_TOOLS, roles: ["owner", "worker", "client"] });
   }
 
   return groups;
@@ -98,15 +93,13 @@ export default function Sidebar() {
   const { data: session } = useSession();
   const sessionRole = (session?.user?.role ?? "CUSTOMER").toLowerCase() as UserRole;
 
-  const [role, setRole] = useState<UserRole>(sessionRole);
   const [collapsed, setCollapsed] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const { resolvedTheme, setTheme } = useTheme();
 
-  const groups = buildGroups(role);
-  const showRoleSwitcher = sessionRole === "owner";
+  const groups = buildGroups(sessionRole);
 
-  const visibleGroups = groups.filter((group) => group.roles.includes(role));
+  const visibleGroups = groups.filter((group) => group.roles.includes(sessionRole));
 
   return (
     <aside
@@ -123,11 +116,9 @@ export default function Sidebar() {
       />
 
       <div className="relative z-20 flex items-center justify-between px-3 py-4">
-        {!collapsed && (
-          <span className="text-xs font-bold tracking-[0.3em] text-text-dim">
-            D V C L B 254
-          </span>
-        )}
+        <Link href="/" aria-label="Home">
+          <Logo size="sm" showPulse />
+        </Link>
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
@@ -138,33 +129,23 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {showRoleSwitcher && (
-        <div className="relative z-20 border-t border-border-soft px-3 py-2">
-          {!collapsed && (
-            <span className="text-[9px] uppercase tracking-wider text-text-dim2">
-              ROLE:
-            </span>
-          )}
-          <div className={`mt-1 flex items-center gap-1 ${collapsed ? "flex-col" : "flex-row"}`}>
-            {(["owner", "worker", "client"] as const).map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRole(r)}
-                className={`relative flex items-center justify-center rounded border text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
-                  role === r
-                    ? `${ROLE_BADGE_COLORS[r]} ${ROLE_COLORS[r]} shadow-[0_0_8px]`
-                    : "border-border-soft text-text-dim hover:border-info hover:text-info"
-                } ${collapsed ? "h-8 w-8" : "h-7 flex-1 px-2 py-1"}`}
-                aria-pressed={role === r}
-                title={collapsed ? r : undefined}
-              >
-                {!collapsed && <span>{r}</span>}
-              </button>
-            ))}
-          </div>
+      <div className="relative z-20 border-t border-border-soft px-3 py-2">
+        {!collapsed && (
+          <span className="text-[9px] uppercase tracking-wider text-text-dim2">
+            ROLE:
+          </span>
+        )}
+        <div className={`mt-1 flex items-center ${collapsed ? "flex-col" : "flex-row"}`}>
+          <span
+            className={`relative flex items-center justify-center rounded border text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
+              `${ROLE_BADGE_COLORS[sessionRole]} ${ROLE_COLORS[sessionRole]} shadow-[0_0_8px]`
+            } ${collapsed ? "h-8 w-8" : "h-7 flex-1 px-2 py-1"}`}
+            title={collapsed ? sessionRole : undefined}
+          >
+            {!collapsed && <span>{sessionRole}</span>}
+          </span>
         </div>
-      )}
+      </div>
 
       <div className="relative z-20 border-t border-border-soft px-3 py-2">
         {!collapsed && (
