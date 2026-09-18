@@ -84,7 +84,7 @@ const ACCESSORIES = [
   },
 ] as const;
 
-const INTRO_DURATION_MS = 60_000;
+const INTRO_DURATION_MS = 2_000;
 const TICK_MS = INTRO_DURATION_MS / 100;
 
 export default function Home() {
