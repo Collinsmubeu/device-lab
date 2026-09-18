@@ -1,4 +1,3 @@
-import Navbar from "@/app/components/Navbar";
 import QuoteEngine from "@/app/components/QuoteEngine";
 
 export const metadata = {
@@ -8,45 +7,23 @@ export const metadata = {
 
 export default function TradeInPage() {
   return (
-    <>
-      <Navbar />
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <header className="mb-12">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight uppercase">
+          OFFLOAD YOUR RIG
+        </h1>
+        <p className="mt-2 text-text-dim max-w-2xl">
+          Transparent, instant valuations. No lowball offers. M-Pesa payout dispatched same day.
+          Your old hardware funds the next upgrade.
+        </p>
+      </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="mb-12">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight uppercase">
-            OFFLOAD YOUR RIG
-          </h1>
-          <p className="mt-2 text-text-dim max-w-2xl">
-            Transparent, instant valuations. No lowball offers. M-Pesa payout dispatched same day.
-            Your old hardware funds the next upgrade.
-          </p>
-        </header>
-
-        <section aria-labelledby="quote-heading" className="max-w-2xl">
-          <h2 id="quote-heading" className="sr-only">
-            Instant Valuation Engine
-          </h2>
-          <QuoteEngine />
-        </section>
-      </main>
-
-      <footer className="border-t border-border bg-card/60 px-6 py-8 font-mono">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
-            <div className="space-y-1 text-xs text-text-dim">
-              <p>{"// STATUS: SYSTEMS_NOMINAL"}</p>
-              <p>{"// LOCATION: NAIROBI_KENYA"}</p>
-            </div>
-
-            <a
-              href="/admin"
-              className="text-[10px] uppercase tracking-wider text-text-dim transition-colors hover:text-neon"
-            >
-              [ ADMINISTRATIVE_PORTAL ]
-            </a>
-          </div>
-        </div>
-      </footer>
-    </>
+      <section aria-labelledby="quote-heading" className="max-w-2xl">
+        <h2 id="quote-heading" className="sr-only">
+          Instant Valuation Engine
+        </h2>
+        <QuoteEngine />
+      </section>
+    </main>
   );
 }
