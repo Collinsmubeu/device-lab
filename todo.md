@@ -23,17 +23,26 @@
     - `cmubeu@gmail.com` → `OWNER`
     - All other sign-ups → `CUSTOMER`
   - Workers are assigned by the owner through the admin layer
+- **Database users** — real users with bcrypt-hashed passwords:
+  - `owner@device254.dev / lab254-rock` → OWNER
+  - `worker@device254.dev / work254-pass` → WORKER
+  - `client@device254.dev / client254-pass` → CUSTOMER
 - **Login redirect map**
   - `OWNER` → `/admin/dashboard`
   - `WORKER` → `/staff/dashboard`
   - `CUSTOMER` → `/customer/dashboard`
+  - Redirects handled by `/api/auth/callback/role-redirect`
+- **OAuth account linking** (`src/lib/auth-options.ts`)
+  - `allowDangerousEmailAccountLinking: true` on Google provider
+  - Existing DB users with matching email get Google OAuth account auto-linked
+  - No more `OAuthAccountNotLinked` or `OAuthCreateAccount` errors
 - **Session middleware** (`middleware.ts`)
   - `/admin/**` → OWNER only
   - `/staff/**` → WORKER or OWNER
-   - `/customer/**`, `/checkout/**`, `/cash-out/**` → any authenticated user
-   - Implemented via JWT token cookie parsing (no DB round-trip in middleware)
-   - Redirect unauthenticated users to `/signin?callbackUrl=<original_path>`
-   - Role-based access enforcement on protected routes
+  - `/customer/**`, `/checkout/**`, `/cash-out/**` → any authenticated user
+  - Implemented via NextAuth `getToken()` (JWT-based, no DB round-trip)
+  - Redirect unauthenticated users to `/signin?callbackUrl=<original_path>`
+  - Role-based access enforcement on protected routes
 
 ## Showroom Sections
 
