@@ -3,24 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useTheme } from "next-themes";
 import { ChevronDown, User } from "lucide-react";
-
-const themes = [
-  { id: "obsidian", label: "[ ⚡_OBSIDIAN ]", activeClass: "border-neon bg-neon/10 text-neon" },
-  { id: "matrix", label: "[ ◯_MATRIX ]", activeClass: "border-info bg-info/10 text-info" },
-  { id: "circuit", label: "[ ⎇_CIRCUIT ]", activeClass: "border-blue-400 bg-blue-400/10 text-blue-400" },
-  { id: "rust", label: "[ 🔥_RUST ]", activeClass: "border-amber-500 bg-amber-500/10 text-amber-500" },
-  { id: "friendly", label: "[ ☀_FRIENDLY ]", activeClass: "border-warning bg-warning/10 text-warning" },
-  { id: "cyberpunk", label: "[ 🌙_CYBERPUNK ]", activeClass: "border-pink bg-pink/10 text-pink" },
-  { id: "synthwave", label: "[ 🌊_SYNTHWAVE ]", activeClass: "border-info bg-info/10 text-info" },
-  { id: "retro", label: "[ 🔥_RETRO ]", activeClass: "border-warning bg-warning/10 text-warning" },
-] as const;
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { data: session } = useSession();
-  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -76,27 +63,6 @@ export default function Navbar() {
             LIVE_INTAKE_OPEN
           </span>
 
-          {/* Theme Switcher */}
-          <div className="hidden items-center gap-1 sm:flex" role="group" aria-label="Theme selector">
-            {themes.map((t) => {
-              const isActive = theme === t.id;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setTheme(t.id)}
-                  className={`rounded border border-border px-2 py-1 text-[9px] font-mono font-bold uppercase tracking-wider transition-all duration-200 ${
-                    isActive
-                      ? `${t.activeClass} shadow-neon-glow`
-                      : "bg-card/40 text-text-dim hover:border-info hover:text-info hover:shadow-info-glow"
-                  }`}
-                  aria-pressed={isActive}
-                >
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
-
           {session?.user && (
             <div className="relative flex items-center gap-2">
               <span className="hidden text-xs text-text-dim sm:inline">
@@ -105,20 +71,36 @@ export default function Navbar() {
               <div className="relative group">
                 <button
                   type="button"
-                  className="flex items-center justify-center rounded-full border border-border bg-card/60 p-1.5 text-text-dim transition-all duration-200 hover:border-neon hover:text-neon"
+                  className="flex items-center justify-center rounded-full border border-border bg-card/60 p-1 text-text-dim transition-all duration-200 hover:border-neon hover:text-neon"
                 >
-                  {session.user.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={session.user.image}
-                      alt="Profile"
-                      className="h-6 w-6 rounded-full"
-                    />
-                  ) : (
-                    <User className="h-4 w-4" />
-                  )}
+                  <div className="relative h-7 w-7 rounded-full overflow-hidden bg-gradient-to-br from-neon/30 to-info/30 flex items-center justify-center">
+                    {session.user.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={session.user.image}
+                        alt={session.user.email ?? "Profile"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <User className="h-4 w-4 text-text-dim" />
+                    )}
+                    <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-neon border-2 border-canvas" />
+                  </div>
                   <ChevronDown className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
+                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card/95 backdrop-blur shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <div className="p-2">
+                    <p className="px-3 py-2 text-[11px] font-mono font-bold text-text-dim">{session.user.email}</p>
+                    <span className="px-3 py-1 text-[10px] font-mono text-neon capitalize">{(session.user as { role?: string })?.role?.toLowerCase() ?? "customer"}</span>
+                  </div>
+                  <hr className="border-border mx-2" />
+                  <Link
+                    href="/api/auth/signout"
+                    className="block px-3 py-2 text-[11px] font-mono text-danger hover:bg-danger/10 transition-colors"
+                  >
+                    [ LOGOUT ]
+                  </Link>
+                </div>
               </div>
             </div>
           )}
