@@ -4,6 +4,7 @@ import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
+import bcrypt from "bcrypt";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase() ?? "cmubeu@gmail.com";
 
@@ -41,36 +42,13 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
         const email = credentials.email.toLowerCase();
-        const password = credentials.password;
-
-        if (process.env.NODE_ENV !== "production") {
-          const DEV_CREDS: Record<string, { password: string; role: "OWNER" | "WORKER" | "CUSTOMER" }> = {
-            "owner@device254.dev": { password: "lab254-rock", role: "OWNER" },
-            "worker@device254.dev": { password: "work254-pass", role: "WORKER" },
-            "client@device254.dev": { password: "client254-pass", role: "CUSTOMER" },
-          };
-
-          const devCred = DEV_CREDS[email];
-          if (devCred && password === devCred.password) {
-            return {
-              id: `dev-${email}`,
-              email,
-              name: email.split("@")[0],
-              role: devCred.role,
-            };
-          }
-        }
-
         const user = await db.user.findUnique({ where: { email } });
         if (!user) return null;
 
-        const bcrypt = await import("bcrypt");
-        const isValid = await bcrypt.compare(password, user.passwordHash);
+        const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!isValid) return null;
 
         return {
@@ -95,6 +73,11 @@ export const authOptions: AuthOptions = {
       }
       // Ensure role is set for Google users based on email
       if (account?.provider === "google" && token.email) {
+        const emailLower = token.email.toLowerCase();
+        token.role = emailLower === ADMIN_EMAIL ? "OWNER" : "CUSTOMER";
+      }
+      // Fallback: set role from email if not already set
+      if (token.email && !token.role) {
         const emailLower = token.email.toLowerCase();
         token.role = emailLower === ADMIN_EMAIL ? "OWNER" : "CUSTOMER";
       }
@@ -124,10 +107,11 @@ export const authOptions: AuthOptions = {
           const existingAccount = await db.account.findFirst({
             where: {
               userId: existingUser.id,
-               providerAccountId: account.providerAccountId,
               provider: account.provider,
+              providerAccountId: account.providerAccountId,
             },
           });
+
           if (!existingAccount) {
             await db.account.create({
               data: {

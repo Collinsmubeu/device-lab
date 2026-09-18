@@ -3,17 +3,6 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 
-type Role = "OWNER" | "WORKER" | "CUSTOMER";
-
-const ROLE_ROUTES: Record<Role, string> = {
-  OWNER: "/admin/dashboard",
-  WORKER: "/staff/dashboard",
-  CUSTOMER: "/customer/dashboard",
-};
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase() ?? "owner@device254.dev";
-const DEV_OWNER_EMAILS = ["cmubeu@gmail.com", ADMIN_EMAIL];
-const DEV_WORKER_EMAILS = ["worker@device254.dev"];
 
 export default function SigninForm() {
   const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
@@ -31,20 +20,11 @@ export default function SigninForm() {
     setFeedback("[ SYS_VERIFYING // ACCESSING PORTAL_PERMISSIONS... ]");
 
     try {
-      const lowerEmail = email.toLowerCase();
-      let role: Role = "CUSTOMER";
-      if (DEV_OWNER_EMAILS.includes(lowerEmail)) {
-        role = "OWNER";
-      } else if (DEV_WORKER_EMAILS.includes(lowerEmail)) {
-        role = "WORKER";
-      }
-      const route = ROLE_ROUTES[role];
-
       const result = await signIn("credentials", {
         redirect: true,
         email,
         password,
-        callbackUrl: route,
+        callbackUrl: "/api/auth/callback/role-redirect",
       });
 
       if (result?.error) {
@@ -63,23 +43,15 @@ export default function SigninForm() {
     signIn("google", { callbackUrl: "/api/auth/callback/role-redirect" });
   };
 
-  const roleLabels: Record<Role, string> = {
-    OWNER: "OWNER",
-    WORKER: "WORKER",
-    CUSTOMER: "CLIENT",
-  };
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-canvas font-mono">
       <div className="w-full max-w-md space-y-6">
-        {/* Header */}
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-[0.3em] text-text">
             D V C L B // AUTH_GATE_254
           </h1>
         </div>
 
-        {/* Mode Toggle */}
         <div className="flex justify-center gap-2">
           <button
             type="button"
@@ -105,7 +77,6 @@ export default function SigninForm() {
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-[10px] uppercase tracking-wider text-text-dim">
@@ -132,7 +103,7 @@ export default function SigninForm() {
               onChange={(e) => setPassword(e.target.value)}
               disabled={isSubmitting || isGoogleSubmitting}
               className="mt-1 w-full rounded border-2 border-border bg-card px-3 py-2 text-sm text-text font-mono placeholder:text-text-dim focus:border-neon focus:outline-none"
-              placeholder="••••••"
+              placeholder="password"
               required
             />
           </div>
@@ -166,7 +137,6 @@ export default function SigninForm() {
           </div>
         )}
 
-        {/* Divider */}
         <div className="relative my-4 flex items-center">
           <span className="absolute inset-x-0 top-1/2 h-px bg-border" />
           <span className="relative inline-block bg-canvas px-2 text-[10px] uppercase tracking-wider text-text-dim">
@@ -174,7 +144,6 @@ export default function SigninForm() {
           </span>
         </div>
 
-        {/* Google OAuth */}
         <button
           type="button"
           disabled={isSubmitting || isGoogleSubmitting}
@@ -201,16 +170,6 @@ export default function SigninForm() {
           </svg>
           {isGoogleSubmitting ? "[ CONNECTING... ]" : "[ CONTINUE WITH GOOGLE ]"}
         </button>
-
-        {/* Dev Credentials Helper */}
-        <div className="mt-6 rounded border border-border bg-card/40 px-3 py-2 text-[10px] font-mono text-text-dim">
-          <p className="mb-1 uppercase tracking-wider text-warning">
-            [ DEV_ACCESS // QUICK_LOGIN ]
-          </p>
-          <p>{roleLabels.OWNER}: {ADMIN_EMAIL} / lab254-rock</p>
-          <p>{roleLabels.WORKER}: worker@device254.dev / work254-pass</p>
-          <p>{roleLabels.CUSTOMER}: client@device254.dev / client254-pass</p>
-        </div>
       </div>
     </div>
   );
