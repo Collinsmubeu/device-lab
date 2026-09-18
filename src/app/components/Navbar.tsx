@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ThemeSwitcher } from "@/app/components/ThemeSwitcher";
+import { useSession } from "next-auth/react";
+import { ChevronDown, User } from "lucide-react";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -16,64 +18,43 @@ export default function Navbar() {
   return (
     <nav
       className={`sticky top-0 z-50 border-b font-mono text-xs transition-all duration-300 ${
-        scrolled
-          ? "border-border bg-canvas/80 backdrop-blur"
-          : "border-transparent bg-canvas"
+        scrolled ? "border-border bg-canvas/80 backdrop-blur" : "border-transparent bg-canvas"
       }`}
     >
-      <div className="mx-auto flex h-12 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        {/* Left Zone: Logo & Subtitle */}
-        <div className="flex flex-col">
-          <span className="text-xs tracking-[0.3em] text-text">
-            D V C L B // 254
-          </span>
-          <span className="text-[9px] text-text-dim">
-            Nairobi_HQ // Hardware.Archive
-          </span>
-        </div>
-
-        {/* Center Zone: Nav Links */}
-        <div className="hidden items-center gap-6 md:flex">
-          <Link
-            href="#marketplace"
-            className="text-text-dim transition-colors hover:text-neon"
-          >
-            [ 01_MARKETPLACE ]
-          </Link>
-          <Link
-            href="/trade-in"
-            className="text-text-dim transition-colors hover:text-neon"
-          >
-            [ 02_TRADE_IN ]
-          </Link>
-          <Link
-            href="#services"
-            className="text-text-dim transition-colors hover:text-neon"
-          >
-            [ 03_SERVICES ]
-          </Link>
-        </div>
-
-        {/* Right Zone: Auth + Theme + Live Status */}
-        <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-2 sm:flex">
-            <span className="text-[9px] uppercase tracking-wider text-text-dim">
-              THEME:
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-3 w-3">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon opacity-75"></span>
+                <span className="relative inline-flex h-3 w-3 rounded-full border border-neon bg-neon shadow-neon-glow"></span>
+              </span>
+              <span className="text-xl font-black tracking-[0.4em] text-neon">
+                D V C L B 254
+              </span>
+            </div>
+            <span className="text-[9px] text-text-dim">
+              Nairobi_HQ // Hardware_Archive
             </span>
-            <ThemeSwitcher />
           </div>
-          <Link
-            href="/signin?mode=register"
-            className="rounded border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-dim transition-colors hover:border-neon hover:text-neon"
-          >
-            [ SECURE_ACCOUNT // SIGN_UP ]
+        </div>
+
+        <div className="hidden items-center gap-6 md:flex">
+          <Link href="#marketplace" className="group relative text-text-dim transition-colors hover:text-neon">
+            <span className="relative z-10">[ 01_MARKETPLACE ]</span>
+            <span className="absolute bottom-0 left-0 right-0 h-px bg-neon/0 group-hover:bg-neon/50 transition-all duration-300"></span>
           </Link>
-          <Link
-            href="/signin"
-            className="rounded border border-neon bg-neon/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neon transition-colors hover:bg-neon/20"
-          >
-            [ AUTHENTICATE // LOGIN ]
+          <Link href="/trade-in" className="group relative text-text-dim transition-colors hover:text-neon">
+            <span className="relative z-10">[ 02_TRADE_IN ]</span>
+            <span className="absolute bottom-0 left-0 right-0 h-px bg-neon/0 group-hover:bg-neon/50 transition-all duration-300"></span>
           </Link>
+          <Link href="#services" className="group relative text-text-dim transition-colors hover:text-neon">
+            <span className="relative z-10">[ 03_SERVICES ]</span>
+            <span className="absolute bottom-0 left-0 right-0 h-px bg-neon/0 group-hover:bg-neon/50 transition-all duration-300"></span>
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-3">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon opacity-75"></span>
             <span className="relative inline-flex h-2 w-2 rounded-full bg-info"></span>
@@ -81,6 +62,49 @@ export default function Navbar() {
           <span className="hidden text-xs text-text-dim lg:inline">
             LIVE_INTAKE_OPEN
           </span>
+
+          {session?.user && (
+            <div className="relative flex items-center gap-2">
+              <span className="hidden text-xs text-text-dim sm:inline">
+                {session.user.email}
+              </span>
+              <div className="relative group">
+                <button
+                  type="button"
+                  className="flex items-center justify-center rounded-full border border-border bg-card/60 p-1.5 text-text-dim transition-all duration-200 hover:border-neon hover:text-neon"
+                >
+                  {session.user.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={session.user.image}
+                      alt="Profile"
+                      className="h-6 w-6 rounded-full"
+                    />
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
+                  <ChevronDown className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!session && (
+            <>
+              <Link
+                href="/signin?mode=register"
+                className="rounded border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-dim transition-colors hover:border-neon hover:text-neon"
+              >
+                [ SECURE_ACCOUNT // SIGN_UP ]
+              </Link>
+              <Link
+                href="/signin"
+                className="rounded border border-neon bg-neon/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neon transition-colors hover:bg-neon/20"
+              >
+                [ AUTHENTICATE // LOGIN ]
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

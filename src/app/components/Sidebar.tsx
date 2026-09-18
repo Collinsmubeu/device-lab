@@ -18,8 +18,6 @@ import {
   Zap,
   Key,
   LifeBuoy,
-  Bot,
-  Cpu,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -65,10 +63,7 @@ const CLIENT_ITEMS: SidebarItem[] = [
   { label: "Customer Support Center", href: "/client/support", icon: LifeBuoy, roles: ["client"] },
 ];
 
-const KILO_TOOLS: SidebarItem[] = [
-  { label: "Kilo Code AI Prompt Agent", href: "/automation/kilo-agent", icon: Bot, roles: ["owner", "worker", "client"] },
-  { label: "Battery Optimizer", href: "/automation/battery", icon: Cpu, roles: ["owner", "worker", "client"] },
-];
+const KILO_TOOLS: SidebarItem[] = [];
 
 const ALL_THEMES = ["obsidian", "matrix", "circuit", "rust", "friendly", "cyberpunk", "synthwave", "retro"] as const;
 
@@ -78,20 +73,15 @@ function buildGroups(role: UserRole): SidebarGroup[] {
   ];
 
   if (role === "owner") {
-    groups.push(
-      { title: "OWNER CONTROL", items: OWNER_ITEMS, roles: ["owner"] },
-      { title: "KILO AUTOMATION TOOLS", items: KILO_TOOLS, roles: ["owner", "worker", "client"] },
-    );
+    groups.push({ title: "OWNER CONTROL", items: OWNER_ITEMS, roles: ["owner"] });
   } else if (role === "worker") {
-    groups.push(
-      { title: "WORKER PORTAL", items: WORKER_ITEMS, roles: ["worker"] },
-      { title: "KILO AUTOMATION TOOLS", items: KILO_TOOLS, roles: ["owner", "worker", "client"] },
-    );
+    groups.push({ title: "WORKER PORTAL", items: WORKER_ITEMS, roles: ["worker"] });
   } else {
-    groups.push(
-      { title: "CLIENT PORTAL", items: CLIENT_ITEMS, roles: ["client"] },
-      { title: "KILO AUTOMATION TOOLS", items: KILO_TOOLS, roles: ["owner", "worker", "client"] },
-    );
+    groups.push({ title: "CLIENT PORTAL", items: CLIENT_ITEMS, roles: ["client"] });
+  }
+
+  if (KILO_TOOLS.length > 0) {
+    groups.push({ title: "KILO AUTOMATION TOOLS", items: KILO_TOOLS, roles: ["owner", "worker", "client"] });
   }
 
   return groups;

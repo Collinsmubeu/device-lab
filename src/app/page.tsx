@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Navbar from "@/app/components/Navbar";
 import HeroSection from "@/app/components/HeroSection";
 import LaptopCatalog from "@/app/components/LaptopCatalog";
 
@@ -211,8 +210,6 @@ export default function Home() {
 
   return (
     <div className="animate-in fade-in duration-500">
-      <Navbar />
-
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <HeroSection />
 
@@ -253,25 +250,6 @@ export default function Home() {
         </a>
       </section>
       </main>
-
-      {/* Industrial Footer Matrix */}
-      <footer className="border-t border-border bg-gradient-card px-6 py-8 font-mono">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
-            <div className="space-y-1 text-xs text-text-dim">
-              <p>{"// STATUS: SYSTEMS_NOMINAL"}</p>
-              <p>{"// LOCATION: NAIROBI_KENYA"}</p>
-            </div>
-
-            <a
-              href="/admin"
-              className="text-[10px] uppercase tracking-wider text-text-dim transition-colors hover:text-info"
-            >
-              [ ADMINISTRATIVE_PORTAL ]
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
