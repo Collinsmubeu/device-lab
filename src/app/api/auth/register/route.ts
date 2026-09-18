@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { db } from "@/lib/db";
 import { Prisma, UserRole as PrismaUserRole } from "@prisma/client";
 
@@ -31,8 +32,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
     const existingUser = await db.user.findUnique({
-      where: { email: email.trim().toLowerCase() },
+      where: { email: normalizedEmail },
     });
 
     if (existingUser) {
@@ -44,13 +46,24 @@ export async function POST(request: NextRequest) {
 
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
-    const role = resolveRole(email);
+    const role = resolveRole(normalizedEmail);
 
     const user = await db.user.create({
       data: {
-        email: email.trim().toLowerCase(),
+        email: normalizedEmail,
         passwordHash,
         role,
+        emailVerified: null,
+      },
+    });
+
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    await db.verificationToken.create({
+      data: {
+        identifier: normalizedEmail,
+        token: verificationToken,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       },
     });
 
@@ -58,6 +71,7 @@ export async function POST(request: NextRequest) {
       {
         message: "[ ONBOARDING_SUCCESSFUL // ROLE_LOCKED_IN ]",
         user: { email: user.email, role: user.role },
+        verificationToken,
       },
       { status: 201 },
     );

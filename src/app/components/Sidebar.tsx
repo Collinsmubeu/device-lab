@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import {
   Home,
@@ -14,16 +15,14 @@ import {
   DollarSign,
   Users,
   Workflow,
-  Code2,
-  Bug,
   Zap,
   Key,
   LifeBuoy,
   Bot,
   Cpu,
-  GitBranch,
   ChevronLeft,
   ChevronRight,
+  LogOut,
 } from "lucide-react";
 
 export type UserRole = "owner" | "worker" | "client";
@@ -42,219 +41,93 @@ export interface SidebarGroup {
 }
 
 const COMMON_ITEMS: SidebarItem[] = [
-  {
-    label: "Dashboard Homepage",
-    href: "/",
-    icon: Home,
-    roles: ["owner", "worker", "client"],
-  },
-  {
-    label: "Prompt Marketplace Grid",
-    href: "/marketplace",
-    icon: LayoutGrid,
-    roles: ["owner", "worker", "client"],
-  },
-  {
-    label: "Notification Station",
-    href: "/notifications",
-    icon: Bell,
-    roles: ["owner", "worker", "client"],
-  },
-  {
-    label: "Profile & Settings",
-    href: "/settings",
-    icon: Settings,
-    roles: ["owner", "worker", "client"],
-  },
+  { label: "Dashboard Homepage", href: "/", icon: Home, roles: ["owner", "worker", "client"] },
+  { label: "Prompt Marketplace Grid", href: "/marketplace", icon: LayoutGrid, roles: ["owner", "worker", "client"] },
+  { label: "Notification Station", href: "/notifications", icon: Bell, roles: ["owner", "worker", "client"] },
+  { label: "Profile & Settings", href: "/settings", icon: Settings, roles: ["owner", "worker", "client"] },
 ];
 
 const OWNER_ITEMS: SidebarItem[] = [
-  {
-    label: "Remote Owner Control Panel",
-    href: "/admin/control",
-    icon: Shield,
-    roles: ["owner"],
-  },
-  {
-    label: "Live Audit Log Hub",
-    href: "/admin/audit",
-    icon: FileText,
-    roles: ["owner"],
-  },
-  {
-    label: "Marketplace Financial Engine",
-    href: "/admin/finance",
-    icon: DollarSign,
-    roles: ["owner"],
-  },
-  {
-    label: "Role Assignment Console",
-    href: "/admin/roles",
-    icon: Users,
-    roles: ["owner"],
-  },
+  { label: "Remote Owner Control Panel", href: "/admin/control", icon: Shield, roles: ["owner"] },
+  { label: "Live Audit Log Hub", href: "/admin/audit", icon: FileText, roles: ["owner"] },
+  { label: "Marketplace Financial Engine", href: "/admin/finance", icon: DollarSign, roles: ["owner"] },
+  { label: "Role Assignment Console", href: "/admin/roles", icon: Users, roles: ["owner"] },
 ];
 
 const WORKER_ITEMS: SidebarItem[] = [
-  {
-    label: "Active Task Portal",
-    href: "/worker/tasks",
-    icon: Workflow,
-    roles: ["worker"],
-  },
-  {
-    label: "Developer Workspace",
-    href: "/worker/workspace",
-    icon: Code2,
-    roles: ["worker"],
-  },
-  {
-    label: "Prompt Benchmarking",
-    href: "/worker/benchmark",
-    icon: BarChart3,
-    roles: ["worker"],
-  },
-  {
-    label: "Support Ticket Desk",
-    href: "/worker/tickets",
-    icon: Bug,
-    roles: ["worker"],
-  },
+  { label: "Active Task Portal", href: "/worker/tasks", icon: Workflow, roles: ["worker"] },
+  { label: "Prompt Benchmarking", href: "/worker/benchmark", icon: BarChart3, roles: ["worker"] },
 ];
 
 const CLIENT_ITEMS: SidebarItem[] = [
-  {
-    label: "Instant Quote Engine",
-    href: "/client/quote",
-    icon: Zap,
-    roles: ["client"],
-  },
-  {
-    label: "Bought Prompt Vault",
-    href: "/client/vault",
-    icon: Key,
-    roles: ["client"],
-  },
-  {
-    label: "Customer Support Center",
-    href: "/client/support",
-    icon: LifeBuoy,
-    roles: ["client"],
-  },
-  {
-    label: "Seller Setup Hub",
-    href: "/client/seller",
-    icon: Users,
-    roles: ["client"],
-  },
+  { label: "Instant Quote Engine", href: "/client/quote", icon: Zap, roles: ["client"] },
+  { label: "Bought Prompt Vault", href: "/client/vault", icon: Key, roles: ["client"] },
+  { label: "Customer Support Center", href: "/client/support", icon: LifeBuoy, roles: ["client"] },
 ];
 
 const KILO_TOOLS: SidebarItem[] = [
-  {
-    label: "Kilo Code AI Prompt Agent",
-    href: "/automation/kilo-agent",
-    icon: Bot,
-    roles: ["owner", "worker", "client"],
-  },
-  {
-    label: "Battery Optimizer",
-    href: "/automation/battery",
-    icon: Cpu,
-    roles: ["owner", "worker", "client"],
-  },
-  {
-    label: "Code Converter",
-    href: "/automation/converter",
-    icon: GitBranch,
-    roles: ["owner", "worker", "client"],
-  },
+  { label: "Kilo Code AI Prompt Agent", href: "/automation/kilo-agent", icon: Bot, roles: ["owner", "worker", "client"] },
+  { label: "Battery Optimizer", href: "/automation/battery", icon: Cpu, roles: ["owner", "worker", "client"] },
 ];
+
+const ALL_THEMES = ["obsidian", "matrix", "circuit", "rust", "friendly", "cyberpunk", "synthwave", "retro"] as const;
 
 function buildGroups(role: UserRole): SidebarGroup[] {
   const groups: SidebarGroup[] = [
-    {
-      title: "COMMON TOOLS",
-      items: COMMON_ITEMS,
-      roles: ["owner", "worker", "client"],
-    },
+    { title: "COMMON TOOLS", items: COMMON_ITEMS, roles: ["owner", "worker", "client"] },
   ];
 
   if (role === "owner") {
     groups.push(
-      {
-        title: "OWNER CONTROL",
-        items: OWNER_ITEMS,
-        roles: ["owner"],
-      },
-      {
-        title: "KILO AUTOMATION TOOLS",
-        items: KILO_TOOLS,
-        roles: ["owner", "worker", "client"],
-      },
+      { title: "OWNER CONTROL", items: OWNER_ITEMS, roles: ["owner"] },
+      { title: "KILO AUTOMATION TOOLS", items: KILO_TOOLS, roles: ["owner", "worker", "client"] },
     );
   } else if (role === "worker") {
     groups.push(
-      {
-        title: "WORKER PORTAL",
-        items: WORKER_ITEMS,
-        roles: ["worker"],
-      },
-      {
-        title: "KILO AUTOMATION TOOLS",
-        items: KILO_TOOLS,
-        roles: ["owner", "worker", "client"],
-      },
+      { title: "WORKER PORTAL", items: WORKER_ITEMS, roles: ["worker"] },
+      { title: "KILO AUTOMATION TOOLS", items: KILO_TOOLS, roles: ["owner", "worker", "client"] },
     );
   } else {
     groups.push(
-      {
-        title: "CLIENT PORTAL",
-        items: CLIENT_ITEMS,
-        roles: ["client"],
-      },
-      {
-        title: "KILO AUTOMATION TOOLS",
-        items: KILO_TOOLS,
-        roles: ["owner", "worker", "client"],
-      },
+      { title: "CLIENT PORTAL", items: CLIENT_ITEMS, roles: ["client"] },
+      { title: "KILO AUTOMATION TOOLS", items: KILO_TOOLS, roles: ["owner", "worker", "client"] },
     );
   }
 
   return groups;
 }
 
-interface SidebarProps {
-  activeRole?: UserRole;
-}
+const ROLE_COLORS: Record<UserRole, string> = {
+  owner: "text-warning",
+  worker: "text-info",
+  client: "text-neon",
+};
 
-export default function Sidebar({ activeRole = "client" }: SidebarProps) {
-  const [role, setRole] = useState<UserRole>(activeRole);
+const ROLE_BADGE_COLORS: Record<UserRole, string> = {
+  owner: "border-warning/30 bg-warning/5",
+  worker: "border-info/30 bg-info/5",
+  client: "border-neon/30 bg-neon/5",
+};
+
+export default function Sidebar() {
+  const { data: session } = useSession();
+  const sessionRole = (session?.user?.role ?? "CUSTOMER").toLowerCase() as UserRole;
+
+  const [role, setRole] = useState<UserRole>(sessionRole);
   const [collapsed, setCollapsed] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const { resolvedTheme, setTheme } = useTheme();
 
   const groups = buildGroups(role);
+  const showRoleSwitcher = sessionRole === "owner";
 
-  const roleColors: Record<UserRole, string> = {
-    owner: "text-warning",
-    worker: "text-info",
-    client: "text-neon",
-  };
-
-  const roleBadgeColors: Record<UserRole, string> = {
-    owner: "border-warning/30 bg-warning/5",
-    worker: "border-info/30 bg-info/5",
-    client: "border-neon/30 bg-neon/5",
-  };
+  const visibleGroups = groups.filter((group) => group.roles.includes(role));
 
   return (
     <aside
-      className={`relative flex h-screen flex-col overflow-hidden border-r border-border-soft bg-gradient-to-b from-slate-950 via-slate-900 to-black transition-all duration-300 ${
-        collapsed ? "w-16" : "w-64"
-      }`}
+      className={`relative flex h-screen flex-col overflow-hidden border-r border-border bg-gradient-to-b from-slate-950 via-slate-900 to-black transition-all duration-300 ${collapsed ? "w-16" : "w-64"}`}
       aria-label="Sidebar navigation"
     >
-      {/* Dot-matrix pattern overlay */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -264,11 +137,10 @@ export default function Sidebar({ activeRole = "client" }: SidebarProps) {
         aria-hidden="true"
       />
 
-      {/* Header: Logo + Collapse Toggle */}
       <div className="relative z-20 flex items-center justify-between px-3 py-4">
         {!collapsed && (
           <span className="text-xs font-bold tracking-[0.3em] text-text-dim">
-            AUTOMATION // DASH
+            D V C L B 254
           </span>
         )}
         <button
@@ -277,50 +149,38 @@ export default function Sidebar({ activeRole = "client" }: SidebarProps) {
           className="rounded border border-border-soft bg-card/60 p-1.5 text-text-dim transition-all duration-200 hover:border-neon hover:text-neon hover:shadow-neon-glow"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
       </div>
 
-      {/* Role Selector (Sandbox testing) */}
-      <div className="relative z-20 border-t border-border-soft px-3 py-2">
-        {!collapsed && (
-          <span className="text-[9px] uppercase tracking-wider text-text-dim2">
-            ROLE:
-          </span>
-        )}
-        <div
-          className={`mt-1 flex items-center gap-1 ${collapsed ? "flex-col" : "flex-row"}`}
-        >
-          {(["owner", "worker", "client"] as const).map((r) => (
-            <button
-              key={r}
-              type="button"
-              onClick={() => setRole(r)}
-              className={`relative flex items-center justify-center rounded border text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
-                role === r
-                  ? `${roleBadgeColors[r]} ${roleColors[r]} shadow-[0_0_8px]` 
-                  : "border-border-soft text-text-dim hover:border-info hover:text-info"
-              } ${collapsed ? "h-8 w-8" : "h-7 flex-1 px-2 py-1"}`}
-              aria-pressed={role === r}
-              title={collapsed ? r : undefined}
-            >
-              <span
-                className={`absolute inset-0 rounded opacity-0 transition-opacity duration-200 ${
-                  role === r ? "opacity-100" : "group-hover:opacity-50"
-                }`}
-                aria-hidden="true"
-              />
-              {!collapsed && <span>{r}</span>}
-            </button>
-          ))}
+      {showRoleSwitcher && (
+        <div className="relative z-20 border-t border-border-soft px-3 py-2">
+          {!collapsed && (
+            <span className="text-[9px] uppercase tracking-wider text-text-dim2">
+              ROLE:
+            </span>
+          )}
+          <div className={`mt-1 flex items-center gap-1 ${collapsed ? "flex-col" : "flex-row"}`}>
+            {(["owner", "worker", "client"] as const).map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRole(r)}
+                className={`relative flex items-center justify-center rounded border text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
+                  role === r
+                    ? `${ROLE_BADGE_COLORS[r]} ${ROLE_COLORS[r]} shadow-[0_0_8px]`
+                    : "border-border-soft text-text-dim hover:border-info hover:text-info"
+                } ${collapsed ? "h-8 w-8" : "h-7 flex-1 px-2 py-1"}`}
+                aria-pressed={role === r}
+                title={collapsed ? r : undefined}
+              >
+                {!collapsed && <span>{r}</span>}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Theme Toggle */}
       <div className="relative z-20 border-t border-border-soft px-3 py-2">
         {!collapsed && (
           <span className="text-[9px] uppercase tracking-wider text-text-dim2">
@@ -329,20 +189,21 @@ export default function Sidebar({ activeRole = "client" }: SidebarProps) {
         )}
         <button
           type="button"
-          onClick={() => setTheme(resolvedTheme === "dark" ? "matrix" : "obsidian")}
-          className={`mt-1 flex w-full items-center justify-center rounded border border-border-soft bg-card/40 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-text-dim transition-all duration-200 hover:border-info hover:text-info hover:shadow-info-glow ${
-            collapsed ? "aspect-square" : ""
-          }`}
-          title="Toggle theme"
+          onClick={() => {
+            const currentIndex = ALL_THEMES.indexOf(resolvedTheme as typeof ALL_THEMES[number]);
+            const nextIndex = (currentIndex + 1) % ALL_THEMES.length;
+            setTheme(ALL_THEMES[nextIndex]);
+          }}
+          className={`mt-1 flex w-full items-center justify-center rounded border border-border-soft bg-card/40 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-text-dim transition-all duration-200 hover:border-info hover:text-info hover:shadow-info-glow ${collapsed ? "aspect-square" : ""}`}
+          title="Cycle themes"
         >
-          {!collapsed && <span>{resolvedTheme === "dark" ? "[ LIGHT_MODE ]" : "[ DARK_MODE ]"}</span>}
+          {!collapsed && <span>[{resolvedTheme?.toUpperCase() ?? "OBSIDIAN"}]</span>}
         </button>
       </div>
 
-      {/* Navigation Groups */}
       <nav className="relative z-20 flex-1 overflow-y-auto py-2">
         <div className="space-y-4 px-2">
-          {groups.map((group) => (
+          {visibleGroups.map((group) => (
             <div key={group.title}>
               {!collapsed && (
                 <p className="mb-2 px-3 text-[9px] font-medium uppercase tracking-wider text-text-dim2">
@@ -357,16 +218,12 @@ export default function Sidebar({ activeRole = "client" }: SidebarProps) {
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        className={`group relative mx-2 flex items-center gap-3 rounded-md border border-transparent px-3 py-2 text-[11px] font-mono font-medium uppercase tracking-wider text-text-dim transition-all duration-200 hover:translate-x-1 hover:border-info hover:text-info hover:shadow-info-glow ${
-                          isHovered ? "bg-info/5 scale-[1.02]" : ""
-                        }`}
+                        className={`group relative mx-2 flex items-center gap-3 rounded-md border border-transparent px-3 py-2 text-[11px] font-mono font-medium uppercase tracking-wider text-text-dim transition-all duration-200 hover:translate-x-1 hover:border-info hover:text-info hover:shadow-info-glow ${isHovered ? "bg-info/5 scale-[1.02]" : ""}`}
                         onMouseEnter={() => setHoveredItem(item.label)}
                         onMouseLeave={() => setHoveredItem(null)}
                       >
                         <Icon
-                          className={`h-4 w-4 shrink-0 transition-colors duration-200 ${
-                            isHovered ? "text-info" : "text-text-dim"
-                          }`}
+                          className={`h-4 w-4 shrink-0 transition-colors duration-200 ${isHovered ? "text-info" : "text-text-dim"}`}
                         />
                         {!collapsed && <span>{item.label}</span>}
 
@@ -385,13 +242,14 @@ export default function Sidebar({ activeRole = "client" }: SidebarProps) {
         </div>
       </nav>
 
-      {/* Footer */}
       <div className="relative z-20 border-t border-border-soft px-3 py-3">
-        {!collapsed && (
-          <p className="text-[9px] uppercase tracking-wider text-text-dim2">
-            v254.0.0-beta // ROBOTIC_MODE
-          </p>
-        )}
+        <Link
+          href="/api/auth/signout"
+          className={`group relative mx-2 flex items-center gap-3 rounded-md border border-transparent px-3 py-2 text-[11px] font-mono font-medium uppercase tracking-wider text-text-dim transition-all duration-200 hover:translate-x-1 hover:border-danger hover:text-danger hover:shadow-danger-glow ${collapsed ? "justify-center" : ""}`}
+        >
+          <LogOut className="h-4 w-4 shrink-0 text-text-dim group-hover:text-danger" />
+          {!collapsed && <span>LOGOUT</span>}
+        </Link>
       </div>
     </aside>
   );
