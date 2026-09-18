@@ -3,11 +3,24 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import { ChevronDown, User } from "lucide-react";
+
+const themes = [
+  { id: "obsidian", label: "[ ⚡_OBSIDIAN ]", activeClass: "border-neon bg-neon/10 text-neon" },
+  { id: "matrix", label: "[ ◯_MATRIX ]", activeClass: "border-info bg-info/10 text-info" },
+  { id: "circuit", label: "[ ⎇_CIRCUIT ]", activeClass: "border-blue-400 bg-blue-400/10 text-blue-400" },
+  { id: "rust", label: "[ 🔥_RUST ]", activeClass: "border-amber-500 bg-amber-500/10 text-amber-500" },
+  { id: "friendly", label: "[ ☀_FRIENDLY ]", activeClass: "border-warning bg-warning/10 text-warning" },
+  { id: "cyberpunk", label: "[ 🌙_CYBERPUNK ]", activeClass: "border-pink bg-pink/10 text-pink" },
+  { id: "synthwave", label: "[ 🌊_SYNTHWAVE ]", activeClass: "border-info bg-info/10 text-info" },
+  { id: "retro", label: "[ 🔥_RETRO ]", activeClass: "border-warning bg-warning/10 text-warning" },
+] as const;
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { data: session } = useSession();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -62,6 +75,27 @@ export default function Navbar() {
           <span className="hidden text-xs text-text-dim lg:inline">
             LIVE_INTAKE_OPEN
           </span>
+
+          {/* Theme Switcher */}
+          <div className="hidden items-center gap-1 sm:flex" role="group" aria-label="Theme selector">
+            {themes.map((t) => {
+              const isActive = theme === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTheme(t.id)}
+                  className={`rounded border border-border px-2 py-1 text-[9px] font-mono font-bold uppercase tracking-wider transition-all duration-200 ${
+                    isActive
+                      ? `${t.activeClass} shadow-neon-glow`
+                      : "bg-card/40 text-text-dim hover:border-info hover:text-info hover:shadow-info-glow"
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
 
           {session?.user && (
             <div className="relative flex items-center gap-2">
