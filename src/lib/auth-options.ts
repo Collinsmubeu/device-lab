@@ -95,44 +95,8 @@ export const authOptions: AuthOptions = {
       if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
     },
-    async signIn({ account, profile }) {
-      try {
-        if (!profile?.email) return true;
-
-        const email = profile.email.toLowerCase();
-        const existingUser = await db.user.findUnique({ where: { email } });
-
-        // If user exists and account isn't linked yet, link it
-        if (existingUser && account) {
-          const existingAccount = await db.account.findFirst({
-            where: {
-              userId: existingUser.id,
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-            },
-          });
-
-          if (!existingAccount) {
-            await db.account.create({
-              data: {
-                userId: existingUser.id,
-                type: account.type,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                access_token: account.access_token,
-                token_type: account.token_type,
-                scope: account.scope,
-                id_token: account.id_token,
-              },
-            });
-          }
-        }
-
-        return true;
-      } catch (error) {
-        console.error("DEBUG AUTH COLLAPSE:", error);
-        return false;
-      }
+    async signIn() {
+      return true;
     },
   },
   pages: {
