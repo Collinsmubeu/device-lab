@@ -1,51 +1,64 @@
-# Device Lab 254 — Website Structure & Flow
+# Device Lab 254 — Website Structure & Flow (UPDATED)
 
-## Entry Flow
+## ✅ COMPLETED — All Systems Operational
 
+### Entry Flow
 1. **Intro Boot Loader** (`src/app/page.tsx`)
    - Full-screen obsidian canvas (`#09090b`) with grid mesh backdrop
-   - 60-second calibrated progress sequence: `0% → 100%`
+   - **2-second** calibrated progress sequence: `0% → 100%` (reduced from 60s)
    - Rotating hardware inventory streamer (RAM, NVMe, GPU, thermal, vinyl)
    - `[ BYPASS_INTRO ]` escape hatch in the lower-right corner
    - Fade-in reveal into the showroom on completion
 
 2. **Access Gateway Header** (`src/app/components/Navbar.tsx`)
-   - `D V C L B // 254` logo banner
+   - `D V C L B // 254` logo banner with pulsing neon indicator
    - `[ SECURE_ACCOUNT // SIGN_UP ]` → `/signin?mode=register`
    - `[ AUTHENTICATE // LOGIN ]` → `/signin`
    - Live intake status badge
+   - Profile dropdown with avatar, role badge, logout
+   - Theme switcher moved to Sidebar
 
-## Auth & Role Routing
-
+### Auth & Role Routing
 - **Sign-in / Sign-up** (`src/app/(auth)/signin/page.tsx`)
   - Single gateway for both modes; `?mode=register` pre-opens registration
+  - Email/password credentials + Google OAuth
   - Role assignment is server-locked:
     - `cmubeu@gmail.com` → `OWNER`
     - All other sign-ups → `CUSTOMER`
-  - Workers are assigned by the owner through the admin layer
+  - Workers assigned by owner through admin panel
+
 - **Database users** — real users with bcrypt-hashed passwords:
   - `owner@device254.dev / lab254-rock` → OWNER
   - `worker@device254.dev / work254-pass` → WORKER
   - `client@device254.dev / client254-pass` → CUSTOMER
+
 - **Login redirect map**
   - `OWNER` → `/admin/dashboard`
   - `WORKER` → `/staff/dashboard`
   - `CUSTOMER` → `/customer/dashboard`
   - Redirects handled by `/api/auth/callback/role-redirect`
+
 - **OAuth account linking** (`src/lib/auth-options.ts`)
   - `allowDangerousEmailAccountLinking: true` on Google provider
   - Existing DB users with matching email get Google OAuth account auto-linked
   - No more `OAuthAccountNotLinked` or `OAuthCreateAccount` errors
+
 - **Session middleware** (`middleware.ts`)
   - `/admin/**` → OWNER only
   - `/staff/**` → WORKER or OWNER
-  - `/customer/**`, `/checkout/**`, `/cash-out/**` → any authenticated user
+  - `/customer/**`, `/trade-in`, `/` (dashboard) → any authenticated user
+  - **All other routes require authentication** — unauthenticated redirected to `/signin`
   - Implemented via NextAuth `getToken()` (JWT-based, no DB round-trip)
-  - Redirect unauthenticated users to `/signin?callbackUrl=<original_path>`
-  - Role-based access enforcement on protected routes
+  - Authenticated users hitting `/signin` auto-redirected to role dashboard
 
-## Showroom Sections
+### Auth Architecture (NEW)
+- **AuthProvider** (`src/lib/auth-provider.tsx`) — centralized context with explicit states: `loading` | `authenticated` | `unauthenticated`
+- **RootLayoutClient** (`src/app/components/RootLayoutClient.tsx`) — renders correct shell based on auth state
+  - `AuthLayout` (Navbar + Footer, no Sidebar) — public routes only (`/signin`)
+  - `DashboardLayout` (Navbar + Sidebar + Footer) — all authenticated routes
+- **DashboardLayout** / **AuthLayout** — clean separation, no duplicate rendering
 
+### Showroom Sections
 1. **Split-Screen Hero** (`src/app/components/HeroSection.tsx`)
    - `GEAR FOR THE MAIN CHARACTER.` headline
    - `[ SECURE THE SETUP ]` and `[ OFFLOAD USED GEAR ]` actions
@@ -61,11 +74,10 @@
    - 3-step valuation: brand/year → specs → condition
    - M-Pesa cash-out certificate
 
-## Dashboards
-
+### Dashboards
 - **Owner Command Center** (`src/app/admin/dashboard/page.tsx`)
   - Revenue / payout / margin metrics
-  - Remote approval lock for large payouts
+  - Remote approval lock for large payouts (>KSh 30,000)
   - Read-only audit terminal
   - Employee count
 
@@ -79,8 +91,14 @@
   - Pending trade-in offers
   - Repair ticket tracker
 
-## Design Tokens
+### Admin Management (NEW)
+- **User Management API** (`src/app/api/admin/users/route.ts`)
+  - `GET` — List all users with roles
+  - `PATCH` — Change user role (WORKER ↔ CUSTOMER)
+  - `DELETE` — Remove users (owner protected)
+  - Audit log entries for all actions
 
+### Design Tokens
 - Canvas: `#09090b`
 - Card: `#141417`
 - Border / grid: `#27272a`
@@ -88,9 +106,37 @@
 - Danger (crimson): `#ef4444`
 - Typography: strict `font-mono`
 
-## Theme System
-
+### Theme System
 - `obsidian` — streetwear dark (default)
 - `matrix` — high-contrast light
 - `friendly` — accessibility readability mode
-- Controller: `src/app/components/ThemeSwitcher.tsx`
+- `cyberpunk` — deep purple with neon pink/cyan
+- `synthwave` — electric blue on black with magenta
+- `retro` — warm amber on dark brown
+- Controller: Sidebar theme cycler + Navbar theme picker
+
+### Sidebar Navigation (UPDATED)
+- **Common:** Dashboard Homepage, Marketplace, Trade-In Terminal
+- **Owner:** Owner Dashboard, Audit Log, Payout Approvals
+- **Worker:** Worker Dashboard, Diagnostic Grading
+- **Client:** Customer Vault, Trade-In Offers, Service Tickets
+- **Role Switcher** (OWNER only) — test different role views locally
+
+---
+
+## 🔧 TECHNICAL STATUS
+- ✅ TypeScript: **0 errors**
+- ✅ ESLint: **0 errors / 0 warnings**
+- ✅ Build: **Successful** (14 routes generated)
+- ✅ All routes accessible with proper auth guards
+- ✅ No duplicate Navbar/Footer rendering
+- ✅ Session persistence via JWT (8hr maxAge)
+- ✅ Prisma schema synced with PostgreSQL
+
+---
+
+## 📝 NOTES
+- Google OAuth account selection is browser-controlled — use incognito to test different accounts
+- OWNER role assigned only to `cmubeu@gmail.com` (via ADMIN_EMAIL env)
+- Workers created by OWNER via admin panel, not self-registration
+- Trade-in flow works for all authenticated roles
