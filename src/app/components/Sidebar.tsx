@@ -91,15 +91,15 @@ const ROLE_BADGE_COLORS: Record<UserRole, string> = {
 
 export default function Sidebar() {
   const { data: session } = useSession();
-  const sessionRole = (session?.user?.role ?? "CUSTOMER").toLowerCase() as UserRole;
 
+  const [role, setRole] = useState<UserRole>((session?.user?.role ?? "CUSTOMER").toLowerCase() as UserRole);
   const [collapsed, setCollapsed] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const { resolvedTheme, setTheme } = useTheme();
 
-  const groups = buildGroups(sessionRole);
+  const groups = buildGroups(role);
 
-  const visibleGroups = groups.filter((group) => group.roles.includes(sessionRole));
+  const visibleGroups = groups.filter((group) => group.roles.includes(role));
 
   return (
     <aside
@@ -135,15 +135,23 @@ export default function Sidebar() {
             ROLE:
           </span>
         )}
-        <div className={`mt-1 flex items-center ${collapsed ? "flex-col" : "flex-row"}`}>
-          <span
-            className={`relative flex items-center justify-center rounded border text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
-              `${ROLE_BADGE_COLORS[sessionRole]} ${ROLE_COLORS[sessionRole]} shadow-[0_0_8px]`
-            } ${collapsed ? "h-8 w-8" : "h-7 flex-1 px-2 py-1"}`}
-            title={collapsed ? sessionRole : undefined}
-          >
-            {!collapsed && <span>{sessionRole}</span>}
-          </span>
+        <div className={`mt-1 flex items-center gap-1 ${collapsed ? "flex-col" : "flex-row"}`}>
+          {(["owner", "worker", "client"] as const).map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => setRole(r)}
+              className={`relative flex items-center justify-center rounded border text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
+                role === r
+                  ? `${ROLE_BADGE_COLORS[r]} ${ROLE_COLORS[r]} shadow-[0_0_8px]`
+                  : "border-border-soft text-text-dim hover:border-info hover:text-info"
+              } ${collapsed ? "h-8 w-8" : "h-7 flex-1 px-2 py-1"}`}
+              aria-pressed={role === r}
+              title={collapsed ? r : undefined}
+            >
+              {!collapsed && <span>{r}</span>}
+            </button>
+          ))}
         </div>
       </div>
 
