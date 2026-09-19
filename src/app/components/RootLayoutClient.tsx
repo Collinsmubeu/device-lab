@@ -1,18 +1,12 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-provider";
 import DashboardLayout from "@/app/components/DashboardLayout";
 import AuthLayout from "@/app/components/AuthLayout";
 import type { ReactNode } from "react";
 
-const PUBLIC_ROUTES = ["/", "/signin", "/trade-in", "/admin/login"];
-
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const { status } = useAuth();
-
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
   if (status === "loading") {
     return (
@@ -31,12 +25,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
     return <DashboardLayout>{children}</DashboardLayout>;
   }
 
-  // Unauthenticated users on public routes get the auth layout (navbar + footer, no sidebar)
-  if (isPublicRoute) {
-    return <AuthLayout>{children}</AuthLayout>;
-  }
-
-  // Unauthenticated users on non-public routes fall through to AuthLayout
-  // (middleware will redirect to /signin for protected routes)
+  // Unauthenticated users get the auth layout (navbar + footer, no sidebar).
+  // Middleware redirects protected routes to /signin before this renders.
   return <AuthLayout>{children}</AuthLayout>;
 }
