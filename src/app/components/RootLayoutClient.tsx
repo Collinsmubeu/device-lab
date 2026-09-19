@@ -1,12 +1,28 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useAuth } from "@/lib/auth-provider";
 import DashboardLayout from "@/app/components/DashboardLayout";
 import AuthLayout from "@/app/components/AuthLayout";
 import type { ReactNode } from "react";
 
+const AUTH_PUBLIC_ROUTES = ["/signin"];
+
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
   const { status } = useAuth();
+
+  const isAuthPublicRoute = AUTH_PUBLIC_ROUTES.includes(pathname);
+
+  // Always run the redirect effect for unauthenticated users
+  useEffect(() => {
+    if (status === "unauthenticated" && !isAuthPublicRoute) {
+      router.push("/signin");
+    }
+  }, [status, isAuthPublicRoute, router]);
 
   if (status === "loading") {
     return (
@@ -25,7 +41,6 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
     return <DashboardLayout>{children}</DashboardLayout>;
   }
 
-  // Unauthenticated users get the auth layout (navbar + footer, no sidebar).
-  // Middleware redirects protected routes to /signin before this renders.
+  // Unauthenticated users on /signin get auth layout
   return <AuthLayout>{children}</AuthLayout>;
 }
